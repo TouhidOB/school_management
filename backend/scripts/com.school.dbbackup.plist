@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.school.dbbackup</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/m3air/Desktop/Files/django project/Multi Vendor School Management System/backend/scripts/backup_db.sh</string>
+    </array>
+
+    <!-- Run every 12 hours (12 * 60 * 60 = 43200 seconds) -->
+    <key>StartInterval</key>
+    <integer>43200</integer>
+
+    <!-- Run once immediately upon loading/login -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/m3air/Desktop/Files/django project/Multi Vendor School Management System/backend/backups/launchd_stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/m3air/Desktop/Files/django project/Multi Vendor School Management System/backend/backups/launchd_stderr.log</string>
+</dict>
+</plist>

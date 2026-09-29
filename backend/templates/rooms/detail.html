@@ -1,0 +1,67 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}{{ room.name }}{% endblock %}
+{% block content %}
+<div x-data="{tab:'feed'}">
+  <div class="rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 p-6 text-white">
+    <h2 class="text-2xl font-bold">{{ room.name }}</h2>
+    <p class="text-brand-100">{{ room.subject.name }} · {{ room.section }} · Code {{ room.room_code }}</p>
+  </div>
+
+  <div class="mt-4 flex gap-1 border-b border-slate-200 text-sm">
+    <button @click="tab='feed'" :class="tab==='feed'?'border-brand-600 text-brand-700':'border-transparent text-slate-500'" class="border-b-2 px-4 py-2 font-medium">Feed</button>
+    <button @click="tab='notes'" :class="tab==='notes'?'border-brand-600 text-brand-700':'border-transparent text-slate-500'" class="border-b-2 px-4 py-2 font-medium">Notes</button>
+    <button @click="tab='work'" :class="tab==='work'?'border-brand-600 text-brand-700':'border-transparent text-slate-500'" class="border-b-2 px-4 py-2 font-medium">Assignments</button>
+    <button @click="tab='people'" :class="tab==='people'?'border-brand-600 text-brand-700':'border-transparent text-slate-500'" class="border-b-2 px-4 py-2 font-medium">People</button>
+  </div>
+
+  <!-- FEED -->
+  <div x-show="tab==='feed'" class="mt-5 space-y-4">
+    {% if can_post %}
+    <form method="post" enctype="multipart/form-data" class="rounded-xl bg-white ring-1 ring-slate-200 p-4 space-y-3">
+      {% csrf_token %}
+      {{ post_form.content|field_input }}
+      <div class="flex items-center gap-3">{{ post_form.attachment }}<button class="ml-auto rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Post</button></div>
+    </form>
+    {% endif %}
+    {% for p in posts %}
+    <div class="rounded-xl bg-white ring-1 ring-slate-200 p-4">
+      <div class="flex items-center justify-between text-sm"><span class="font-medium text-slate-800">{{ p.author.get_full_name|default:p.author.username }}</span><span class="text-xs text-slate-400">{{ p.published_at }}</span></div>
+      <p class="mt-2 text-slate-700 whitespace-pre-line">{{ p.content }}</p>
+      {% if p.attachment %}<a href="{{ p.attachment.url }}" class="mt-2 inline-block text-sm text-brand-600 hover:underline">📎 Attachment</a>{% endif %}
+    </div>
+    {% empty %}<p class="text-slate-400 text-sm">No posts yet.</p>{% endfor %}
+  </div>
+
+  <!-- NOTES -->
+  <div x-show="tab==='notes'" x-cloak class="mt-5 space-y-3">
+    {% if can_post %}<a href="{% url 'note_add' room.pk %}" class="inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">+ Add note</a>{% endif %}
+    {% for n in notes %}
+    <div class="rounded-xl bg-white ring-1 ring-slate-200 p-4">
+      <p class="font-medium text-slate-800">{% if n.is_important %}📌 {% endif %}{{ n.title }}</p>
+      <p class="text-sm text-slate-500">{{ n.topic }} {% if n.chapter %}· {{ n.chapter }}{% endif %}</p>
+      {% if n.file %}<a href="{{ n.file.url }}" class="text-sm text-brand-600 hover:underline">Download</a>{% endif %}
+      {% if n.link %}<a href="{{ n.link }}" class="text-sm text-brand-600 hover:underline">Open link</a>{% endif %}
+    </div>
+    {% empty %}<p class="text-slate-400 text-sm">No notes yet.</p>{% endfor %}
+  </div>
+
+  <!-- ASSIGNMENTS -->
+  <div x-show="tab==='work'" x-cloak class="mt-5 space-y-3">
+    {% if can_post %}<a href="{% url 'assignment_add' room.pk %}" class="inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">+ New assignment</a>{% endif %}
+    {% for a in assignments %}
+    <a href="{% url 'assignment_detail' a.pk %}" class="block rounded-xl bg-white ring-1 ring-slate-200 p-4 hover:ring-brand-300">
+      <div class="flex justify-between"><p class="font-medium text-slate-800">{{ a.title }}</p><span class="text-xs text-slate-400">due {{ a.due_datetime }}</span></div>
+      <p class="text-sm text-slate-500">{{ a.total_marks }} marks · {{ a.submissions.count }} submitted</p>
+    </a>
+    {% empty %}<p class="text-slate-400 text-sm">No assignments yet.</p>{% endfor %}
+  </div>
+
+  <!-- PEOPLE -->
+  <div x-show="tab==='people'" x-cloak class="mt-5 rounded-xl bg-white ring-1 ring-slate-200 p-4">
+    <ul class="divide-y divide-slate-100 text-sm">
+      {% for m in participants %}<li class="py-2">{{ m.student.full_name }} <span class="text-xs text-slate-400">Roll {{ m.student.roll_number }}</span></li>{% empty %}<li class="py-2 text-slate-400">No students enrolled.</li>{% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

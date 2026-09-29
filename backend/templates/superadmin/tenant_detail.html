@@ -1,0 +1,31 @@
+{% extends "base_app.html" %}
+{% block page_title %}{{ school.name }}{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">{{ school.name }}</h2>
+  <a href="{% url 'enter_school' school.pk %}" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Manage this school →</a>
+</div>
+<div class="grid gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2 rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <dl class="grid grid-cols-2 gap-y-3 text-sm">
+      <dt class="text-slate-500">Subdomain</dt><dd>{{ school.slug }}.{{ request.get_host }}</dd>
+      <dt class="text-slate-500">Type</dt><dd>{{ school.get_school_type_display }}</dd>
+      <dt class="text-slate-500">Admin email</dt><dd>{{ school.admin_email }}</dd>
+      <dt class="text-slate-500">Plan</dt><dd>{{ school.plan.name|default:"—" }}</dd>
+      <dt class="text-slate-500">Status</dt><dd>{{ school.get_status_display }}</dd>
+      <dt class="text-slate-500">Trial ends</dt><dd>{{ school.trial_ends_at|default:"—" }}</dd>
+      <dt class="text-slate-500">Students</dt><dd>{{ stats.students }}</dd>
+      <dt class="text-slate-500">Teachers</dt><dd>{{ stats.teachers }}</dd>
+    </dl>
+  </div>
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <h3 class="font-semibold text-slate-800 mb-3">Change status</h3>
+    <form method="post" class="space-y-2">
+      {% csrf_token %}
+      {% for val, label in statuses %}
+      <button name="action" value="{{ val }}" class="w-full text-left rounded-lg px-3 py-2 text-sm {% if school.status == val %}bg-brand-600 text-white{% else %}bg-slate-50 hover:bg-slate-100{% endif %}">{{ label }}</button>
+      {% endfor %}
+    </form>
+  </div>
+</div>
+{% endblock %}

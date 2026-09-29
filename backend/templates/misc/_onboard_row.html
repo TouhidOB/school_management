@@ -1,0 +1,10 @@
+<a href="{{ href }}" class="flex items-center gap-4 rounded-xl bg-white ring-1 ring-slate-200 p-4 hover:ring-brand-300">
+  <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full {% if ok %}bg-green-100 text-green-700{% else %}bg-slate-100 text-slate-400{% endif %}">
+    {% if ok %}✓{% else %}○{% endif %}
+  </span>
+  <span class="flex-1">
+    <span class="block font-medium text-slate-800">{{ title }}</span>
+    <span class="block text-sm text-slate-500">{{ desc }}</span>
+  </span>
+  <span class="text-sm text-brand-600">{% if ok %}Review{% else %}Start{% endif %} →</span>
+</a>

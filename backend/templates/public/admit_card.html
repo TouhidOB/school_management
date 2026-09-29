@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admit Card — {{ app.full_name }}</title>
+  <style>
+    :root{ --brand:{{ school.primary_color|default:"#4f46e5" }}; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; background:#eef2f6; color:var(--ink); font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    .toolbar{ max-width:760px; margin:20px auto 0; display:flex; gap:10px; justify-content:flex-end; padding:0 12px; }
+    .btn{ border:0; border-radius:8px; padding:9px 16px; font-size:14px; font-weight:600; cursor:pointer; text-decoration:none; }
+    .btn-print{ background:var(--brand); color:#fff; } .btn-back{ background:#fff; color:var(--ink); border:1px solid #d1d5db; }
+    .sheet{ max-width:760px; margin:14px auto 40px; background:#fff; padding:38px 44px; box-shadow:0 10px 30px rgba(2,6,23,.08); }
+    .head{ display:flex; align-items:center; gap:16px; border-bottom:3px solid var(--brand); padding-bottom:16px; }
+    .head img{ height:56px; } .logo-fb{ width:56px; height:56px; border-radius:10px; background:var(--brand); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:24px; }
+    .school{ font-size:21px; font-weight:800; } .addr{ font-size:12px; color:var(--muted); }
+    .title{ margin-left:auto; text-align:right; } .title h1{ margin:0; font-size:17px; color:var(--brand); letter-spacing:1px; }
+    .code{ margin-top:16px; display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px dashed var(--brand); border-radius:10px; padding:12px 16px; }
+    .code .k{ font-size:11px; text-transform:uppercase; color:var(--muted); } .code .v{ font-size:20px; font-weight:800; color:var(--brand); font-family:monospace; }
+    .grid{ margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:6px 24px; font-size:14px; }
+    .grid .r{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed var(--line); }
+    .grid .r .k{ color:var(--muted); }
+    .status{ display:inline-block; margin-top:4px; padding:4px 12px; border-radius:6px; font-size:12px; font-weight:700; text-transform:uppercase; }
+    .note{ margin-top:22px; font-size:12px; color:var(--muted); line-height:1.6; }
+    .sign{ margin-top:48px; display:flex; justify-content:space-between; }
+    .sign .line{ width:190px; border-top:1px solid var(--ink); padding-top:6px; font-size:12px; color:var(--muted); text-align:center; }
+    @media print{ @page{ margin:12mm; } body{ background:#fff; } .toolbar{ display:none; } .sheet{ box-shadow:none; margin:0; max-width:none; padding:0; } }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="{% url 'admission_track' app.track_token %}" class="btn btn-back">← Status</a>
+    <button onclick="window.print()" class="btn btn-print">🖨 Print / Save PDF</button>
+  </div>
+
+  <div class="sheet">
+    <div class="head">
+      {% if school.logo %}<img src="{{ school.logo.url }}" alt="">{% else %}<div class="logo-fb">{{ school.name|first|upper }}</div>{% endif %}
+      <div>
+        <div class="school">{{ school.name }}</div>
+        <div class="addr">{{ school.address }}{% if school.address and school.phone %} · {% endif %}{{ school.phone }}</div>
+      </div>
+      <div class="title"><h1>ADMISSION ADMIT CARD</h1><div class="addr">Issued {% now "d M Y" %}</div></div>
+    </div>
+
+    <div class="code">
+      <div><div class="k">Tracking / Roll code</div><div class="v">{{ app.tracking_code }}</div></div>
+      <div style="text-align:right">
+        <div class="k">Status</div>
+        <span class="status" style="{% if app.status == 'approved' %}background:#f0fdf4;color:#15803d{% elif app.status == 'rejected' %}background:#fef2f2;color:#b91c1c{% else %}background:#fffbeb;color:#b45309{% endif %}">{{ app.get_status_display }}</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="r"><span class="k">Applicant name</span><span>{{ app.full_name }}</span></div>
+      <div class="r"><span class="k">Class applied</span><span>{{ app.class_applied|default:"—" }}</span></div>
+      <div class="r"><span class="k">Date of birth</span><span>{{ app.dob|date:"d M Y"|default:"—" }}</span></div>
+      <div class="r"><span class="k">Gender</span><span>{{ app.get_gender_display|default:"—" }}</span></div>
+      <div class="r"><span class="k">Guardian</span><span>{{ app.guardian_name|default:"—" }}</span></div>
+      <div class="r"><span class="k">Contact</span><span>{{ app.phone|default:app.guardian_phone|default:"—" }}</span></div>
+      <div class="r"><span class="k">Applied on</span><span>{{ app.created_at|date:"d M Y" }}</span></div>
+      <div class="r"><span class="k">Previous school</span><span>{{ app.previous_school|default:"—" }}</span></div>
+    </div>
+
+    <p class="note">
+      • Bring this admit card (printed) on the admission / interview day.<br>
+      • Carry the completed admission form and required documents (birth certificate, photos, previous results).<br>
+      • This admit card is provisional and does not by itself guarantee admission.
+    </p>
+
+    <div class="sign">
+      <div class="line">Applicant signature</div>
+      <div class="line">Admission Officer</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,4 @@
+<div class="mx-auto mb-8 flex w-fit gap-1 rounded-xl bg-white p-1 ring-1 ring-slate-200">
+  <a href="{% url 'leaderboard' %}" class="rounded-lg px-5 py-2 text-sm font-medium {% if active == 'teachers' %}bg-brand-600 text-white{% else %}text-slate-600 hover:bg-slate-50{% endif %}">Top Teachers</a>
+  <a href="{% url 'school_leaderboard' %}" class="rounded-lg px-5 py-2 text-sm font-medium {% if active == 'schools' %}bg-brand-600 text-white{% else %}text-slate-600 hover:bg-slate-50{% endif %}">Top Schools</a>
+</div>

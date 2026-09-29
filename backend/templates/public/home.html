@@ -1,0 +1,47 @@
+{% extends "base_public.html" %}
+{% block content %}
+<section class="relative overflow-hidden">
+  <div class="mx-auto max-w-6xl px-4 py-24 text-center">
+    <span class="inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-medium text-brand-700">Shopify for Schools</span>
+    <h1 class="mt-6 text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
+      Run your entire school<br>online in a single day.
+    </h1>
+    <p class="mx-auto mt-5 max-w-2xl text-lg text-slate-600">
+      Admissions, classrooms, fees, exams, attendance and parent communication —
+      one platform, your own subdomain, zero setup headaches. Just
+      <strong class="text-slate-800">৳{{ price }} per student</strong>.
+    </p>
+    <div class="mt-8 flex justify-center gap-3">
+      <a href="{% url 'contact' %}" class="rounded-lg bg-brand-600 px-6 py-3 font-medium text-white hover:bg-brand-700">Contact us to get started</a>
+      <a href="{% url 'features' %}" class="rounded-lg bg-white px-6 py-3 font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50">See features</a>
+    </div>
+    <p class="mt-3 text-xs text-slate-400">We set your school up for you — no self-signup, no hidden fees.</p>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 pb-16">
+  <div class="grid gap-6 md:grid-cols-3">
+    <div class="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+      <h3 class="font-semibold text-slate-800">🏫 Classroom Rooms</h3>
+      <p class="mt-2 text-sm text-slate-600">A collaborative space per subject — announcements, notes, assignments and results in one feed.</p>
+    </div>
+    <div class="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+      <h3 class="font-semibold text-slate-800">💳 Flexible Fee Builder</h3>
+      <p class="mt-2 text-sm text-slate-600">Custom fee types, per-class amounts, discounts, and branded invoices your way.</p>
+    </div>
+    <div class="rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+      <h3 class="font-semibold text-slate-800">⭐ Teacher Ratings</h3>
+      <p class="mt-2 text-sm text-slate-600">Anonymous student feedback across six dimensions, with dashboards and leaderboards.</p>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto max-w-3xl px-4 pb-24">
+  <div class="rounded-3xl bg-brand-900 p-10 text-center text-white">
+    <h2 class="text-2xl font-bold">Simple, honest pricing</h2>
+    <p class="mt-4 text-5xl font-extrabold">৳{{ price }}<span class="text-lg font-normal text-brand-100/70"> / student</span></p>
+    <p class="mt-3 text-brand-100/80">One flat rate. Every feature included. Pay manually — bank transfer, bKash or cash — no card required.</p>
+    <a href="{% url 'contact' %}" class="mt-6 inline-block rounded-lg bg-white px-6 py-3 font-medium text-brand-700 hover:bg-brand-50">Talk to us →</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base_app.html" %}
+{% block page_title %}Certificates{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">Certificates</h2>
+  <a href="{% url 'certificate_create' %}" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">+ New certificate</a>
+</div>
+
+<form method="get" class="mb-4 flex flex-wrap items-end gap-3 rounded-xl bg-white ring-1 ring-slate-200 p-3">
+  <div class="flex-1 min-w-[200px]">
+    <div class="relative">
+      <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="search" name="q" value="{{ q }}" placeholder="Search by student or title…" class="form-control" style="padding-left:2.4rem">
+    </div>
+  </div>
+  <button class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Search</button>
+  {% if q %}<a href="{% url 'certificate_list' %}" class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Clear</a>{% endif %}
+</form>
+
+<div class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr>
+      <th class="px-4 py-3">Type</th><th class="px-4 py-3">Student</th><th class="px-4 py-3">Title</th><th class="px-4 py-3">Issued</th><th class="px-4 py-3"></th></tr></thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for c in certificates %}
+      <tr class="hover:bg-slate-50">
+        <td class="px-4 py-3"><span class="rounded-full bg-brand-50 px-2 py-0.5 text-xs text-brand-700">{{ c.get_cert_type_display }}</span></td>
+        <td class="px-4 py-3 font-medium">{{ c.student.full_name }}</td>
+        <td class="px-4 py-3 text-slate-600">{{ c.title }}</td>
+        <td class="px-4 py-3 text-slate-500">{{ c.issue_date }}</td>
+        <td class="px-4 py-3 text-right whitespace-nowrap">
+          <a href="{% url 'certificate_print' c.pk %}" target="_blank" class="text-brand-600 hover:underline">Print</a>
+          <a href="{% url 'certificate_edit' c.pk %}" class="ml-3 text-slate-500 hover:text-brand-600">Edit</a>
+          <a href="{% url 'certificate_delete' c.pk %}" class="ml-3 text-slate-400 hover:text-red-600">Delete</a>
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="5" class="px-4 py-12 text-center text-slate-400">No certificates yet. <a href="{% url 'certificate_create' %}" class="text-brand-600">Create one →</a></td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/_pagination.html" %}
+{% endblock %}

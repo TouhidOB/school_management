@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admission Slip — {{ s.full_name }}</title>
+  <style>
+    :root{ --brand:{{ school.primary_color|default:"#4f46e5" }}; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; background:#eef2f6; color:var(--ink); font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    .toolbar{ max-width:820px; margin:20px auto 0; display:flex; gap:10px; justify-content:flex-end; padding:0 12px; }
+    .btn{ border:0; border-radius:8px; padding:9px 16px; font-size:14px; font-weight:600; cursor:pointer; text-decoration:none; }
+    .btn-print{ background:var(--brand); color:#fff; } .btn-back{ background:#fff; color:var(--ink); border:1px solid #d1d5db; }
+    .btn-amber{ background:#d97706; color:#fff; }
+    .sheet{ max-width:820px; margin:14px auto 40px; background:#fff; padding:40px 46px; box-shadow:0 10px 30px rgba(2,6,23,.08); }
+    .head{ display:flex; align-items:center; gap:16px; border-bottom:3px solid var(--brand); padding-bottom:16px; }
+    .head img{ height:56px; } .head .logo-fallback{ width:56px; height:56px; border-radius:10px; background:var(--brand); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:24px; }
+    .school{ font-size:22px; font-weight:800; } .addr{ font-size:12px; color:var(--muted); }
+    .title{ margin-left:auto; text-align:right; } .title h1{ margin:0; font-size:18px; color:var(--brand); letter-spacing:1px; } .title .d{ font-size:12px; color:var(--muted); }
+    h3{ font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:22px 0 8px; }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:6px 24px; font-size:13.5px; }
+    .grid .r{ display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px dashed var(--line); }
+    .grid .r .k{ color:var(--muted); }
+    .cred{ background:#fffbeb; border:1px solid #fcd34d; border-radius:10px; padding:14px 16px; font-size:13.5px; }
+    .cred .k{ color:#92400e; } .cred code{ background:#fff; border:1px solid #fde68a; padding:2px 8px; border-radius:6px; font-size:14px; }
+    table{ width:100%; border-collapse:collapse; font-size:13px; margin-top:4px; }
+    th{ text-align:left; background:#f8fafc; color:var(--muted); font-size:11px; text-transform:uppercase; padding:8px 10px; border-bottom:1px solid var(--line); }
+    td{ padding:8px 10px; border-bottom:1px solid var(--line); } td.r,th.r{ text-align:right; }
+    .totals{ margin-top:10px; margin-left:auto; width:260px; font-size:13.5px; }
+    .totals .row{ display:flex; justify-content:space-between; padding:4px 0; }
+    .totals .due{ border-top:2px solid var(--ink); margin-top:4px; padding-top:8px; font-weight:800; }
+    .sign{ margin-top:50px; display:flex; justify-content:space-between; }
+    .sign .line{ width:200px; border-top:1px solid var(--ink); padding-top:6px; font-size:12px; color:var(--muted); text-align:center; }
+    .noprint{ }
+    @media print{ @page{ margin:12mm; } body{ background:#fff; } .toolbar,.noprint{ display:none!important; } .sheet{ box-shadow:none; margin:0; max-width:none; padding:0; } }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="{% url 'student_detail' s.pk %}" class="btn btn-back">← Back</a>
+    <button onclick="window.print()" class="btn btn-print">🖨 Print / Save PDF</button>
+  </div>
+
+  <div class="sheet">
+    <div class="head">
+      {% if school.logo %}<img src="{{ school.logo.url }}" alt="">{% else %}<div class="logo-fallback">{{ school.name|first|upper }}</div>{% endif %}
+      <div>
+        <div class="school">{{ school.name }}</div>
+        <div class="addr">{{ school.address }}{% if school.address and school.phone %} · {% endif %}{{ school.phone }}</div>
+      </div>
+      <div class="title"><h1>ADMISSION SLIP</h1><div class="d">Date: {% now "d M Y" %}</div></div>
+    </div>
+
+    <h3>Student information</h3>
+    <div class="grid">
+      <div class="r"><span class="k">Name</span><span>{{ s.full_name }}</span></div>
+      <div class="r"><span class="k">Admission No / ID</span><span>{{ s.admission_number }}</span></div>
+      <div class="r"><span class="k">Class</span><span>{{ s.current_class.name|default:"—" }}{% if s.current_section %} · {{ s.current_section.name }}{% endif %}</span></div>
+      <div class="r"><span class="k">Roll</span><span>{{ s.roll_number|default:"—" }}</span></div>
+      <div class="r"><span class="k">Date of birth</span><span>{{ s.dob|date:"d M Y"|default:"—" }}</span></div>
+      <div class="r"><span class="k">Gender</span><span>{{ s.get_gender_display|default:"—" }}</span></div>
+      <div class="r"><span class="k">Blood group</span><span>{{ s.blood_group|default:"—" }}</span></div>
+      <div class="r"><span class="k">Session</span><span>{{ s.academic_year.name|default:"—" }}</span></div>
+      <div class="r"><span class="k">Admission date</span><span>{{ s.admission_date|date:"d M Y"|default:"—" }}</span></div>
+      <div class="r"><span class="k">Guardian</span><span>{% for g in guardians %}{{ g.name }} ({{ g.get_relation_display }}){% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</span></div>
+    </div>
+
+    <h3>Portal login</h3>
+    {% if s.user %}
+    <div class="cred">
+      <span class="k">Login ID:</span> <code>{{ s.user.username }}</code>
+      {% if s.login_temp_password %}&nbsp;&nbsp; <span class="k">Password:</span> <code>{{ s.login_temp_password }}</code>{% endif %}
+      <div style="margin-top:6px; font-size:11.5px; color:#92400e;">Login ID is permanent. Keep these credentials safe.</div>
+    </div>
+    <a href="{% url 'student_credentials' s.pk %}" class="btn btn-amber noprint" style="font-size:12px; padding:6px 12px; margin-top:8px; display:inline-block;">Change password</a>
+    {% else %}
+    <div class="cred noprint">
+      No portal login yet.
+      <a href="{% url 'student_credentials' s.pk %}" class="btn btn-amber" style="font-size:12px; padding:6px 12px; margin-left:8px;">Set login ID & password</a>
+    </div>
+    {% endif %}
+
+    <h3>Fees</h3>
+    {% if fees.schedule %}
+    <table>
+      <thead><tr><th>Fee</th><th>Frequency</th><th class="r">Amount</th></tr></thead>
+      <tbody>
+        {% for f in fees.schedule %}
+        <tr><td>{{ f.fee_type.name }}</td><td>{{ f.fee_type.get_frequency_display }}</td><td class="r">৳{{ f.amount }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="font-size:13px; color:var(--muted);">No fee structure configured for this class/session.</p>
+    {% endif %}
+
+    <div class="totals">
+      <div class="row"><span style="color:var(--muted)">Total billed</span><span>৳{{ fees.billed }}</span></div>
+      <div class="row"><span style="color:var(--muted)">Paid</span><span>৳{{ fees.paid }}</span></div>
+      <div class="row due"><span>Balance due</span><span>৳{{ fees.due }}</span></div>
+    </div>
+
+    {% if fees.invoices %}
+    <h3>Invoices</h3>
+    <table>
+      <thead><tr><th>Invoice</th><th>Date</th><th class="r">Total</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for i in fees.invoices %}
+        <tr><td>{{ i.invoice_number }}</td><td>{{ i.invoice_date }}</td><td class="r">৳{{ i.grand_total }}</td><td>{{ i.get_status_display }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    <div class="sign">
+      <div class="line">Guardian signature</div>
+      <div class="line">Accounts / Admission Officer</div>
+    </div>
+  </div>
+</body>
+</html>

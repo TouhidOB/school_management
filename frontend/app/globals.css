@@ -1,0 +1,49 @@
+:root {
+  --sms-sidebar-bg: #0f172a;
+  --sms-accent: #2563eb;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+@media print {
+  .MuiDrawer-root,
+  .MuiAppBar-root,
+  .no-print {
+    display: none !important;
+  }
+  
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background-color: white !important;
+  }
+  
+  body, html {
+    background-color: white !important;
+  }
+}
+
+@media print {
+  .tabulation-sheet .MuiTableCell-root {
+    padding: 2px 4px !important;
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+    border-bottom: 1px solid #ccc !important;
+  }
+  .tabulation-sheet .MuiTypography-root {
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+  }
+  .tabulation-sheet .MuiTypography-caption {
+    font-size: 9px !important;
+  }
+  .tabulation-sheet .MuiChip-root {
+    height: 18px !important;
+    font-size: 9px !important;
+  }
+}

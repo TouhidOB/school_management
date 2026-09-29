@@ -1,0 +1,23 @@
+{% extends "base_public.html" %}
+{% block title %}Application received{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-lg px-4 py-20 text-center">
+  <div class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-green-100 text-3xl">✓</div>
+  <h1 class="mt-6 text-2xl font-bold text-slate-900">Application submitted</h1>
+  <p class="mt-3 text-slate-600">Thank you for applying to <strong>{{ school.name }}</strong>.</p>
+
+  <div class="mt-6 rounded-2xl bg-white p-6 ring-1 ring-slate-200 text-left">
+    <p class="text-xs uppercase tracking-wide text-slate-400">Your tracking code</p>
+    <p class="mt-1 text-2xl font-bold text-brand-700">{{ app.tracking_code }}</p>
+    <p class="mt-2 text-sm text-slate-500">Save this. Use it to track your application status and print your admit card.</p>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <a href="{% url 'admission_admit_card' app.track_token %}" target="_blank" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">🖨 Get admit card</a>
+      <a href="{% url 'admission_track' app.track_token %}" class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50">Track status</a>
+    </div>
+  </div>
+
+  <div class="mt-6 flex justify-center gap-3">
+    <a href="{% url 'admissions' %}" class="text-sm font-medium text-brand-600 hover:underline">Apply to another school</a>
+  </div>
+</section>
+{% endblock %}

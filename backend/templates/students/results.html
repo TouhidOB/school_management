@@ -1,0 +1,17 @@
+{% extends "base_app.html" %}
+{% block page_title %}Results{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">My results</h2>
+<div class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Exam</th><th class="px-4 py-3">Subject</th><th class="px-4 py-3 text-right">Marks</th><th class="px-4 py-3">Grade</th></tr></thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for r in results %}
+      <tr><td class="px-4 py-2">{{ r.exam_subject.exam_session.name }}</td><td class="px-4 py-2">{{ r.exam_subject.subject.name }}</td><td class="px-4 py-2 text-right font-medium">{{ r.marks_obtained }}</td><td class="px-4 py-2">{{ r.grade|default:"—" }}</td></tr>
+      {% empty %}<tr><td colspan="4" class="px-4 py-12 text-center text-slate-400">No results published yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% include "partials/_pagination.html" %}
+{% endblock %}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }} — {{ cert.student.full_name }}</title>
+  <style>
+    :root{ --ink:#1f2937; --muted:#6b7280; --gold:#b08d2d; --brand:#4f46e5; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; background:#e5e7eb; color:var(--ink);
+      font-family:Georgia,"Times New Roman",serif; }
+    .toolbar{ max-width:900px; margin:20px auto 0; display:flex; gap:10px; justify-content:flex-end; padding:0 12px;
+      font-family:-apple-system,Segoe UI,Roboto,sans-serif; }
+    .btn{ border:0; border-radius:8px; padding:9px 16px; font-size:14px; font-weight:600; cursor:pointer; text-decoration:none; }
+    .btn-print{ background:var(--brand); color:#fff; } .btn-back{ background:#fff; color:var(--ink); border:1px solid #d1d5db; }
+    .sheet{ max-width:900px; margin:14px auto 40px; background:#fff; padding:20px;
+      box-shadow:0 12px 34px rgba(0,0,0,.15); }
+    .frame{ border:2px solid var(--gold); padding:6px; }
+    .inner{ border:1px solid var(--gold); padding:46px 56px; position:relative; }
+    .corner{ position:absolute; width:26px; height:26px; border:2px solid var(--gold); }
+    .c-tl{ top:10px; left:10px; border-right:0; border-bottom:0; }
+    .c-tr{ top:10px; right:10px; border-left:0; border-bottom:0; }
+    .c-bl{ bottom:10px; left:10px; border-right:0; border-top:0; }
+    .c-br{ bottom:10px; right:10px; border-left:0; border-top:0; }
+    .head{ text-align:center; }
+    .logo{ height:64px; margin-bottom:8px; }
+    .school{ font-size:24px; font-weight:700; letter-spacing:.5px; }
+    .addr{ font-size:13px; color:var(--muted); }
+    .rule{ width:120px; height:3px; background:var(--gold); margin:14px auto; border-radius:2px; }
+    .title{ text-align:center; font-size:30px; letter-spacing:3px; text-transform:uppercase;
+      color:var(--gold); margin:10px 0 4px; }
+    .ref{ text-align:center; font-size:12px; color:var(--muted); font-family:sans-serif; }
+    .body{ margin-top:26px; font-size:16px; line-height:2; text-align:justify; white-space:pre-line; }
+    .sign{ margin-top:64px; display:flex; justify-content:space-between; align-items:flex-end; }
+    .sign .box{ text-align:center; }
+    .sign .line{ width:210px; border-top:1px solid var(--ink); padding-top:6px; font-size:13px; }
+    .sign .name{ font-weight:700; }
+    .seal{ width:92px; height:92px; border:2px dashed var(--gold); border-radius:50%;
+      display:flex; align-items:center; justify-content:center; color:var(--gold);
+      font-size:11px; text-align:center; font-family:sans-serif; }
+    @media print{ @page{ size:A4 landscape; margin:10mm; } body{ background:#fff; }
+      .toolbar{ display:none; } .sheet{ box-shadow:none; margin:0; max-width:none; } }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="{% url 'certificate_list' %}" class="btn btn-back">← Back</a>
+    <a href="{% url 'certificate_edit' cert.pk %}" class="btn btn-back">Edit</a>
+    <button onclick="window.print()" class="btn btn-print">🖨 Print / Save PDF</button>
+  </div>
+
+  <div class="sheet">
+    <div class="frame"><div class="inner">
+      <span class="corner c-tl"></span><span class="corner c-tr"></span>
+      <span class="corner c-bl"></span><span class="corner c-br"></span>
+
+      <div class="head">
+        {% if school.logo %}<img src="{{ school.logo.url }}" class="logo" alt="">{% endif %}
+        <div class="school">{{ school.name }}</div>
+        <div class="addr">{{ school.address }}{% if school.address and school.phone %} · {% endif %}{{ school.phone }}</div>
+      </div>
+      <div class="rule"></div>
+
+      <div class="title">{{ title }}</div>
+      {% if cert.reference_no %}<div class="ref">Ref: {{ cert.reference_no }} · Date: {{ cert.issue_date }}</div>{% else %}<div class="ref">Date: {{ cert.issue_date }}</div>{% endif %}
+
+      <div class="body">{{ body }}</div>
+
+      <div class="sign">
+        <div class="box">
+          <div class="seal">School<br>Seal</div>
+        </div>
+        <div class="box">
+          <div class="line">
+            {% if cert.signatory_name %}<span class="name">{{ cert.signatory_name }}</span><br>{% endif %}
+            {{ cert.signatory_designation|default:"Authorised Signatory" }}
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</body>
+</html>

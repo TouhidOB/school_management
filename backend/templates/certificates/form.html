@@ -1,0 +1,59 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}{% if cert %}Edit{% else %}New{% endif %} certificate{% endblock %}
+{% block content %}
+<div class="mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">{% if cert %}Edit certificate{% else %}Issue a certificate{% endif %}</h2>
+  <p class="text-sm text-slate-500">Pick a type to load a starting template, then edit the text. {placeholders} are filled from the student when printed.</p>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2 rounded-xl bg-white ring-1 ring-slate-200 p-6">
+    <form method="post" class="space-y-5">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form.visible_fields %}
+      <div>
+        <div class="flex items-center justify-between">
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {% if field.name == 'cert_type' %}<button type="button" onclick="loadTemplate()" class="text-xs font-medium text-brand-600 hover:underline">Load template text</button>{% endif %}
+        </div>
+        {{ field|field_input }}
+        {% if field.help_text %}<p class="mt-1 text-xs text-slate-400">{{ field.help_text }}</p>{% endif %}
+        {% for e in field.errors %}<p class="mt-1 text-xs text-red-600">{{ e }}</p>{% endfor %}
+      </div>
+      {% endfor %}
+      <div class="flex items-center gap-3 pt-1">
+        <button class="rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white hover:bg-brand-700">Save & preview</button>
+        <a href="{% url 'certificate_list' %}" class="text-sm text-slate-500 hover:text-slate-700">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5 h-fit">
+    <h3 class="font-semibold text-slate-800 mb-2">Placeholders</h3>
+    <p class="text-xs text-slate-500 mb-3">Type these in the body — they're replaced at print time.</p>
+    <div class="flex flex-wrap gap-1.5 text-xs">
+      {% for ph in placeholders %}<code class="rounded bg-slate-100 px-1.5 py-0.5">&#123;{{ ph }}&#125;</code>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<script id="cert-defaults" type="application/json">{{ defaults_json|safe }}</script>
+<script>
+  const DEFAULTS = JSON.parse(document.getElementById('cert-defaults').textContent);
+  function loadTemplate(){
+    const type = document.getElementById('id_cert_type').value;
+    const d = DEFAULTS[type]; if(!d) return;
+    const body = document.getElementById('id_body');
+    const title = document.getElementById('id_title');
+    if(body.value.trim() && !confirm('Replace the current text with the ' + type + ' template?')) return;
+    title.value = d.title; body.value = d.body;
+  }
+  // Auto-load a template on first pick when body is empty.
+  document.getElementById('id_cert_type').addEventListener('change', function(){
+    const body = document.getElementById('id_body');
+    if(!body.value.trim()){ const d = DEFAULTS[this.value]; if(d){ document.getElementById('id_title').value = d.title; body.value = d.body; } }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}Assignments{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">My assignments</h2>
+<div class="space-y-3">
+  {% for a in assignments %}
+  {% with sub=subs|dict_get:a.pk %}
+  <a href="{% url 'assignment_detail' a.pk %}" class="block rounded-xl bg-white ring-1 ring-slate-200 p-4 hover:ring-brand-300">
+    <div class="flex justify-between">
+      <div><p class="font-medium text-slate-800">{{ a.title }}</p><p class="text-sm text-slate-500">{{ a.room.name }} · due {{ a.due_datetime }}</p></div>
+      <span class="text-xs rounded-full px-2 py-1 h-fit {% if sub and sub.marks_obtained != None %}bg-green-50 text-green-700{% elif sub %}bg-blue-50 text-blue-700{% else %}bg-amber-50 text-amber-700{% endif %}">
+        {% if sub and sub.marks_obtained != None %}Graded {{ sub.marks_obtained }}/{{ a.total_marks }}{% elif sub %}Submitted{% else %}Pending{% endif %}
+      </span>
+    </div>
+  </a>
+  {% endwith %}
+  {% empty %}<p class="text-slate-400">No assignments.</p>{% endfor %}
+</div>
+
+{% include "partials/_pagination.html" %}
+{% endblock %}

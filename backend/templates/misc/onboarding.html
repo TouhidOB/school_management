@@ -1,0 +1,15 @@
+{% extends "base_app.html" %}
+{% block page_title %}Setup Wizard{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800">Get your school ready</h2>
+<p class="text-sm text-slate-500 mb-6">{{ done }} of {{ total }} steps complete.</p>
+<div class="h-2 w-full rounded-full bg-slate-200 mb-8"><div class="h-2 rounded-full bg-brand-600" style="width: {% widthratio done total 100 %}%"></div></div>
+
+<div class="space-y-3 max-w-2xl">
+  {% include "misc/_onboard_row.html" with ok=steps.profile title="School profile" desc="Logo, address & academic year" href="/app/settings/" %}
+  {% include "misc/_onboard_row.html" with ok=steps.academics title="Academic structure" desc="Classes & sections" href="/app/classes/" %}
+  {% include "misc/_onboard_row.html" with ok=steps.fees title="Fee plan" desc="Fee types & invoice design" href="/app/fee-types/" %}
+  {% include "misc/_onboard_row.html" with ok=steps.teacher title="Add a teacher" desc="Your first staff account" href="/app/teachers/create/" %}
+  {% include "misc/_onboard_row.html" with ok=steps.students title="Add students" desc="Manually or via CSV" href="/app/students/create/" %}
+</div>
+{% endblock %}

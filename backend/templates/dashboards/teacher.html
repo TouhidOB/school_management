@@ -1,0 +1,25 @@
+{% extends "base_app.html" %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">Hello, {{ user.get_full_name|default:user.username }}</h2>
+  {% if profile.designation %}<p class="text-sm text-slate-500">{{ profile.designation.name }}</p>{% endif %}
+</div>
+<div class="grid gap-4 sm:grid-cols-3">
+  {% include "partials/_stat.html" with label="My classrooms" value=rooms.count %}
+  {% include "partials/_stat.html" with label="Submissions to grade" value=pending_grading %}
+  {% include "partials/_stat.html" with label="Subjects" value=profile.subjects.count %}
+</div>
+<div class="mt-6 rounded-xl bg-white ring-1 ring-slate-200 p-5">
+  <h3 class="font-semibold text-slate-800">My classrooms</h3>
+  <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {% for r in rooms %}
+    <a href="{% url 'room_detail' r.pk %}" class="rounded-xl border border-slate-200 p-4 hover:border-brand-300 hover:shadow-sm">
+      <p class="font-medium text-slate-800">{{ r.name }}</p>
+      <p class="text-sm text-slate-500">{{ r.section }} · {{ r.subject.name }}</p>
+    </a>
+    {% empty %}<p class="text-slate-400 text-sm">No classrooms assigned yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

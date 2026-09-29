@@ -1,0 +1,18 @@
+{% extends "base_app.html" %}
+{% block page_title %}My Ratings{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">My rating summary</h2>
+{% if not visible %}
+<div class="rounded-xl bg-amber-50 p-6 text-amber-700 ring-1 ring-amber-200">Your scores unlock once at least 5 students have rated you. So far: {{ agg.n|default:0 }}.</div>
+{% else %}
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {% include "partials/_stat.html" with label="Overall" value=agg.ov|floatformat:1 %}
+  {% include "partials/_stat.html" with label="Teaching quality" value=agg.tq|floatformat:1 %}
+  {% include "partials/_stat.html" with label="Punctuality" value=agg.pu|floatformat:1 %}
+  {% include "partials/_stat.html" with label="Helpfulness" value=agg.he|floatformat:1 %}
+  {% include "partials/_stat.html" with label="Assignment feedback" value=agg.af|floatformat:1 %}
+  {% include "partials/_stat.html" with label="Communication" value=agg.co|floatformat:1 %}
+</div>
+<p class="mt-4 text-sm text-slate-400">Based on {{ agg.n }} anonymous ratings.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base_app.html" %}
+{% block page_title %}Marks Entry{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-1">Marks entry</h2>
+<p class="text-sm text-slate-500 mb-6">Open an exam to enter marks for your subjects.</p>
+
+<div class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr>
+      <th class="px-4 py-3">Exam</th><th class="px-4 py-3">Year</th><th class="px-4 py-3">Subjects</th><th class="px-4 py-3">Published</th><th class="px-4 py-3"></th></tr></thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for e in exams %}
+      <tr class="hover:bg-slate-50">
+        <td class="px-4 py-3 font-medium">{{ e.name }}</td>
+        <td class="px-4 py-3 text-slate-500">{{ e.academic_year.name }}</td>
+        <td class="px-4 py-3 text-slate-500">{{ e.exam_subjects.count }}</td>
+        <td class="px-4 py-3">{% if e.is_published %}<span class="rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">Published</span>{% else %}<span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">Draft</span>{% endif %}</td>
+        <td class="px-4 py-3 text-right"><a href="{% url 'exam_detail' e.pk %}" class="text-brand-600 hover:underline">Enter marks →</a></td>
+      </tr>
+      {% empty %}<tr><td colspan="5" class="px-4 py-12 text-center text-slate-400">No exams scheduled yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

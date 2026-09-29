@@ -1,0 +1,44 @@
+{% extends "base_app.html" %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">Welcome back, {{ user.get_full_name|default:user.username }}</h2>
+  <p class="text-sm text-slate-500">Here's what's happening at {{ school.name }}.</p>
+</div>
+
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  {% include "partials/_stat.html" with label="Students" value=students %}
+  {% include "partials/_stat.html" with label="Teachers" value=teachers %}
+  {% include "partials/_stat.html" with label="Classrooms" value=rooms %}
+  {% include "partials/_stat.html" with label="Fees collected" value=collected sub="all time" %}
+</div>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2 rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <div class="flex items-center justify-between">
+      <h3 class="font-semibold text-slate-800">Recent students</h3>
+      <a href="{% url 'student_list' %}" class="text-sm text-brand-600 hover:underline">View all</a>
+    </div>
+    <ul class="mt-4 divide-y divide-slate-100 text-sm">
+      {% for s in recent_students %}
+      <li class="flex items-center justify-between py-2.5">
+        <a href="{% url 'student_detail' s.pk %}" class="font-medium text-slate-700 hover:text-brand-600">{{ s.full_name }}</a>
+        <span class="text-slate-400">{{ s.admission_number }}</span>
+      </li>
+      {% empty %}<li class="py-3 text-slate-400">No students yet. <a href="{% url 'student_create' %}" class="text-brand-600">Add one →</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <h3 class="font-semibold text-slate-800">Quick actions</h3>
+    <div class="mt-4 space-y-2 text-sm">
+      <a href="{% url 'teacher_create' %}" class="block rounded-lg bg-slate-50 px-4 py-2.5 hover:bg-slate-100">+ Add teacher</a>
+      <a href="{% url 'student_create' %}" class="block rounded-lg bg-slate-50 px-4 py-2.5 hover:bg-slate-100">+ Add student</a>
+      <a href="{% url 'room_create' %}" class="block rounded-lg bg-slate-50 px-4 py-2.5 hover:bg-slate-100">+ Create classroom</a>
+      <a href="{% url 'invoice_create' %}" class="block rounded-lg bg-slate-50 px-4 py-2.5 hover:bg-slate-100">+ Generate invoice</a>
+      <a href="{% url 'onboarding' %}" class="block rounded-lg bg-brand-50 px-4 py-2.5 text-brand-700 hover:bg-brand-100">Finish setup wizard →</a>
+    </div>
+  </div>
+</div>
+<p class="mt-4 text-sm text-slate-500">{{ pending_invoices }} invoice(s) awaiting payment.</p>
+{% endblock %}

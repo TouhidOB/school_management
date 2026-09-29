@@ -1,0 +1,22 @@
+{% extends "base_app.html" %}
+{% block page_title %}Finance Dashboard{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">Fee collection</h2>
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {% include "partials/_stat.html" with label="Collected (all time)" value=collected %}
+  {% include "partials/_stat.html" with label="Pending invoices" value=pending_invoices %}
+</div>
+<div class="mt-6 rounded-xl bg-white ring-1 ring-slate-200 p-5">
+  <div class="flex items-center justify-between"><h3 class="font-semibold text-slate-800">Latest invoices</h3><a href="{% url 'invoice_list' %}" class="text-sm text-brand-600">All</a></div>
+  <table class="mt-3 min-w-full text-sm">
+    <tbody class="divide-y divide-slate-100">
+      {% for i in invoices %}
+      <tr><td class="py-2"><a href="{% url 'invoice_detail' i.pk %}" class="text-brand-700 hover:underline">{{ i.invoice_number }}</a></td>
+      <td class="py-2 text-slate-600">{{ i.student.full_name }}</td>
+      <td class="py-2 text-right font-medium">{{ i.grand_total }}</td>
+      <td class="py-2 text-right text-xs text-slate-400">{{ i.get_status_display }}</td></tr>
+      {% empty %}<tr><td class="py-3 text-slate-400">No invoices yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

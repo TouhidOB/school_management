@@ -1,0 +1,15 @@
+{% extends "base_app.html" %}
+{% block page_title %}Fees{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">Fees</h2>
+{% for child, invoices in data.items %}
+<div class="mb-6 rounded-xl bg-white ring-1 ring-slate-200 p-5">
+  <h3 class="font-semibold text-slate-800 mb-3">{{ child.full_name }}</h3>
+  <table class="min-w-full text-sm">
+    <tbody class="divide-y divide-slate-100">
+      {% for i in invoices %}<tr><td class="py-2"><a href="{% url 'invoice_detail' i.pk %}" class="text-brand-700 hover:underline">{{ i.invoice_number }}</a></td><td class="py-2 text-right">{{ i.grand_total }} · {{ i.get_status_display }} · <a href="{% url 'invoice_receipt' i.pk %}" target="_blank" class="text-slate-500 hover:text-brand-600">Receipt</a></td></tr>{% empty %}<tr><td class="py-2 text-slate-400">No invoices.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% empty %}<p class="text-slate-400">No children linked.</p>{% endfor %}
+{% endblock %}

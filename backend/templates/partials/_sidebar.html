@@ -1,0 +1,36 @@
+{% load nav %}
+<aside x-cloak
+  class="fixed inset-y-0 left-0 z-30 flex h-screen w-64 flex-col bg-brand-900 text-brand-100 transition-transform lg:sticky lg:top-0 lg:translate-x-0"
+  :class="sidebar ? 'translate-x-0' : '-translate-x-full'">
+  <div class="h-16 shrink-0 flex items-center gap-2 px-5 border-b border-white/10">
+    <span class="grid h-8 w-8 place-items-center rounded-lg bg-white text-brand-700 font-bold">E</span>
+    <span class="font-bold text-white">EduNest</span>
+    <button @click="sidebar=false" class="ml-auto lg:hidden text-brand-100/70 hover:text-white">
+      <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+
+  <nav class="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-1 text-sm">
+    {% nav_item 'dashboard' 'Dashboard' 'dashboard' %}
+
+    {% if user.role == 'school_admin' or user.role == 'super_admin' and request.school %}
+      {% nav_group 'People' 'people' 'teacher_list|Teachers' 'student_list|Students' 'application_list|Admissions' %}
+      {% nav_group 'Academics' 'academics' 'year_list|Academic Years' 'class_list|Classes' 'section_list|Sections' 'subject_list|Subjects' 'room_list|Classrooms' 'class_routine|Class Routine' %}
+      {% nav_group 'Attendance' 'attendance' 'attendance_mark|Student Attendance' 'staff_attendance|Staff Attendance' 'enrollment_list|Fingerprint IDs' 'device_settings|Attendance Device' %}
+      {% nav_group 'Examinations' 'exams' 'exam_list|Exams' 'certificate_list|Certificates' %}
+      {% nav_group 'Finance' 'finance' 'feetype_list|Fee Types' 'feestructure_list|Fee Structures' 'invoice_list|Invoices' %}
+      {% nav_group 'Insights' 'insights' 'rating_dashboard|Teacher Ratings' 'ratingperiod_list|Rating Periods' 'notification_list|Notifications' %}
+      {% nav_group 'System' 'system' 'onboarding|Setup Wizard' 'settings|Settings' %}
+    {% endif %}
+
+    {% if user.role == 'super_admin' %}
+      {% nav_group 'Platform' 'platform' 'tenant_list|Schools' 'lead_list|Messages' 'plan_list|Plans' %}
+      {% if request.school %}
+      <a href="{% url 'exit_school' %}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-amber-300 hover:bg-white/5">
+        <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Exit school
+      </a>
+      {% endif %}
+    {% endif %}
+  </nav>
+</aside>

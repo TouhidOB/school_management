@@ -1,0 +1,43 @@
+{% extends "base_public.html" %}
+{% block title %}Admissions — EduNest{% endblock %}
+{% block content %}
+<section class="relative overflow-hidden">
+  <div class="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50 to-transparent"></div>
+  <div class="mx-auto max-w-5xl px-4 pt-16 pb-8 text-center">
+    <span class="inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-medium text-brand-700">🎓 Admissions open</span>
+    <h1 class="mt-5 text-4xl font-extrabold tracking-tight text-slate-900">Apply to schools</h1>
+    <p class="mx-auto mt-4 max-w-xl text-lg text-slate-600">Browse schools accepting admissions on EduNest and apply online in minutes.</p>
+    <form method="get" class="mx-auto mt-6 flex max-w-md gap-2">
+      <input type="search" name="q" value="{{ q }}" placeholder="Search by school or city…" class="form-control">
+      <button class="rounded-lg bg-brand-600 px-5 text-sm font-medium text-white hover:bg-brand-700">Search</button>
+    </form>
+  </div>
+</section>
+
+<section class="mx-auto max-w-5xl px-4 pb-24">
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {% for s in schools %}
+    <div class="flex flex-col rounded-2xl bg-white p-6 ring-1 ring-slate-200">
+      <div class="flex items-center gap-3">
+        {% if s.logo %}<img src="{{ s.logo.url }}" class="h-12 w-12 rounded-xl object-contain ring-1 ring-slate-200" alt="">
+        {% else %}<div class="grid h-12 w-12 place-items-center rounded-xl bg-brand-100 text-lg font-bold text-brand-700">{{ s.name|first|upper }}</div>{% endif %}
+        <div class="min-w-0">
+          <p class="truncate font-semibold text-slate-800">{{ s.name }}</p>
+          <p class="truncate text-xs text-slate-500">{{ s.get_school_type_display }}</p>
+        </div>
+      </div>
+      <p class="mt-3 text-sm text-slate-500">{{ s.address|default:s.country|default:"" }}</p>
+      <a href="{% url 'admission_apply' s.slug %}" class="mt-auto pt-4">
+        <span class="block rounded-lg bg-brand-600 py-2 text-center text-sm font-medium text-white hover:bg-brand-700">Apply now →</span>
+      </a>
+    </div>
+    {% empty %}
+    <div class="sm:col-span-2 lg:col-span-3 rounded-2xl bg-white p-16 text-center ring-1 ring-slate-200">
+      <p class="text-5xl">🏫</p>
+      <h2 class="mt-4 text-lg font-semibold text-slate-800">No open admissions right now</h2>
+      <p class="mt-2 text-slate-500">Check back soon — schools open admissions seasonally.</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base_app.html" %}
+{% block page_title %}Attendance{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">Attendance</h2>
+{% for child, records in data.items %}
+<div class="mb-6 rounded-xl bg-white ring-1 ring-slate-200 p-5">
+  <h3 class="font-semibold text-slate-800 mb-3">{{ child.full_name }}</h3>
+  <div class="flex flex-wrap gap-1.5">
+    {% for r in records %}
+    <span title="{{ r.date }}" class="grid h-8 w-8 place-items-center rounded text-xs font-medium
+      {% if r.status == 'present' %}bg-green-100 text-green-700{% elif r.status == 'absent' %}bg-red-100 text-red-700{% elif r.status == 'late' %}bg-amber-100 text-amber-700{% else %}bg-slate-100 text-slate-500{% endif %}">{{ r.date|date:"d" }}</span>
+    {% empty %}<p class="text-slate-400 text-sm">No records.</p>{% endfor %}
+  </div>
+</div>
+{% empty %}<p class="text-slate-400">No children linked.</p>{% endfor %}
+{% endblock %}

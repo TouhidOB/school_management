@@ -1,0 +1,24 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}{% if lead %}Edit message{% else %}New message{% endif %}{% endblock %}
+{% block content %}
+<div class="mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">{% if lead %}Edit message{% else %}New message{% endif %}</h2>
+</div>
+<div class="max-w-2xl rounded-xl bg-white ring-1 ring-slate-200 p-6">
+  <form method="post" class="space-y-5">
+    {% csrf_token %}
+    {% for field in form.visible_fields %}
+    <div>
+      <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+      {{ field|field_input }}
+      {% for e in field.errors %}<p class="mt-1 text-xs text-red-600">{{ e }}</p>{% endfor %}
+    </div>
+    {% endfor %}
+    <div class="flex items-center gap-3 pt-1">
+      <button class="rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white hover:bg-brand-700">Save</button>
+      <a href="{% if lead %}{% url 'lead_detail' lead.pk %}{% else %}{% url 'lead_list' %}{% endif %}" class="text-sm text-slate-500 hover:text-slate-700">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

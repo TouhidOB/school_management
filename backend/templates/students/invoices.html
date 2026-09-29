@@ -1,0 +1,17 @@
+{% extends "base_app.html" %}
+{% block page_title %}Fees{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">My fees</h2>
+<div class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Invoice</th><th class="px-4 py-3">Date</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th></tr></thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for i in invoices %}
+      <tr><td class="px-4 py-2"><a href="{% url 'invoice_detail' i.pk %}" class="text-brand-700 hover:underline">{{ i.invoice_number }}</a></td><td class="px-4 py-2 text-slate-500">{{ i.invoice_date }}</td><td class="px-4 py-2 text-right font-medium">{{ i.grand_total }}</td><td class="px-4 py-2">{{ i.get_status_display }}</td><td class="px-4 py-2 text-right"><a href="{% url 'invoice_receipt' i.pk %}" target="_blank" class="text-slate-500 hover:text-brand-600">Receipt</a></td></tr>
+      {% empty %}<tr><td colspan="5" class="px-4 py-12 text-center text-slate-400">No invoices.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% include "partials/_pagination.html" %}
+{% endblock %}

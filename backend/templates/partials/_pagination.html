@@ -1,0 +1,11 @@
+{% load forms %}
+{% if page_obj.paginator.num_pages > 1 %}
+{% query_without_page as qs %}
+<div class="mt-4 flex items-center justify-between text-sm text-slate-500">
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} · {{ page_obj.paginator.count }} total</span>
+  <div class="flex gap-2">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if qs %}&{{ qs }}{% endif %}" class="rounded-lg bg-white px-3 py-1.5 ring-1 ring-slate-200 hover:bg-slate-50">Prev</a>{% endif %}
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if qs %}&{{ qs }}{% endif %}" class="rounded-lg bg-white px-3 py-1.5 ring-1 ring-slate-200 hover:bg-slate-50">Next</a>{% endif %}
+  </div>
+</div>
+{% endif %}

@@ -1,0 +1,71 @@
+{% extends "base_app.html" %}
+{% block page_title %}Platform{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">Platform overview</h2>
+  <a href="{% url 'school_create' %}" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">+ Add school</a>
+</div>
+
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  {% include "partials/_stat.html" with label="Total schools" value=total_schools %}
+  {% include "partials/_stat.html" with label="Active" value=active %}
+  {% include "partials/_stat.html" with label="Total students" value=total_students %}
+  {% include "partials/_stat.html" with label="Expected revenue" value=expected_revenue sub="৳10 / student · manual" %}
+</div>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-2">
+  <!-- Contact leads inbox -->
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <div class="flex items-center justify-between">
+      <h3 class="font-semibold text-slate-800">Contact messages {% if open_leads %}<span class="ml-1 rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">{{ open_leads }} new</span>{% endif %}</h3>
+      <a href="{% url 'lead_list' %}" class="text-sm text-brand-600 hover:underline">View all</a>
+    </div>
+    <ul class="mt-4 divide-y divide-slate-100">
+      {% for l in leads %}
+      <li class="py-3 {% if l.is_handled %}opacity-60{% endif %}">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-slate-800"><a href="{% url 'lead_detail' l.pk %}" class="hover:text-brand-600">{{ l.name }}</a> {% if l.school_name %}· {{ l.school_name }}{% endif %}</p>
+            <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+              {% if l.phone %}
+              <a href="tel:{{ l.phone }}" class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 font-medium text-green-700 hover:bg-green-100">
+                <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h2.6a1 1 0 011 .76l1 3.5a1 1 0 01-.5 1.13l-1.6.9a12 12 0 005.7 5.7l.9-1.6a1 1 0 011.13-.5l3.5 1a1 1 0 01.76 1V19a2 2 0 01-2 2h-1C9.6 21 3 14.4 3 6V5z"/></svg>
+                {{ l.phone }}
+              </a>
+              {% else %}<span class="text-slate-300">no phone</span>{% endif %}
+              <a href="mailto:{{ l.email }}" class="inline-flex items-center gap-1 text-brand-600 hover:underline">
+                <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l9 6 9-6M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z"/></svg>
+                {{ l.email }}
+              </a>
+              <span class="text-slate-400">{{ l.created_at|date:"M d, H:i" }}</span>
+            </div>
+            {% if l.topic %}<p class="mt-1 text-xs text-brand-600">{{ l.topic }}</p>{% endif %}
+            <p class="mt-1 text-sm text-slate-600 line-clamp-2">{{ l.message }}</p>
+          </div>
+          <div class="shrink-0 text-right space-y-1">
+            {% if l.is_handled %}
+              <span class="block text-xs text-green-600">✓ handled</span>
+            {% else %}
+              <a href="{% url 'school_create' %}?lead={{ l.pk }}" class="block rounded bg-brand-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-brand-700">Create school</a>
+              <a href="{% url 'lead_handled' l.pk %}" class="block text-xs text-slate-400 hover:text-slate-600">Dismiss</a>
+            {% endif %}
+          </div>
+        </div>
+      </li>
+      {% empty %}<li class="py-6 text-center text-sm text-slate-400">No messages yet.</li>{% endfor %}
+    </ul>
+  </div>
+
+  <!-- Recent schools -->
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <div class="flex items-center justify-between"><h3 class="font-semibold text-slate-800">Recent schools</h3><a href="{% url 'tenant_list' %}" class="text-sm text-brand-600">All</a></div>
+    <table class="mt-3 min-w-full text-sm">
+      <tbody class="divide-y divide-slate-100">
+        {% for s in recent %}
+        <tr><td class="py-2"><a href="{% url 'tenant_detail' s.pk %}" class="font-medium text-brand-700 hover:underline">{{ s.name }}</a></td><td class="py-2 text-slate-500">{{ s.get_status_display }}</td><td class="py-2 text-right text-xs text-slate-400">{{ s.created_at|date:"M d" }}</td></tr>
+        {% empty %}<tr><td class="py-3 text-slate-400">No schools yet. <a href="{% url 'school_create' %}" class="text-brand-600">Add one →</a></td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

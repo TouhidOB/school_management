@@ -1,0 +1,67 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}Class Routine{% endblock %}
+{% block content %}
+<div class="mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">Class routine</h2>
+  <p class="text-sm text-slate-500 mt-0.5">Build the weekly timetable for a section. Teachers and students see it automatically.</p>
+</div>
+
+<form method="get" class="mb-6 flex flex-wrap items-end gap-3">
+  <div><label class="block text-xs text-slate-500 mb-1">Section</label>
+    <select name="section" class="rounded-lg border-slate-300 text-sm">
+      <option value="">Choose…</option>
+      {% for s in sections %}<option value="{{ s.pk }}" {% if section and section.pk == s.pk %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select></div>
+  <button class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900">Load</button>
+</form>
+
+{% if section %}
+<div class="grid gap-6 lg:grid-cols-3">
+  <!-- Weekly grid -->
+  <div class="lg:col-span-2 space-y-4">
+    {% for d in days %}
+    <div class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+      <div class="bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">{{ d.1 }}</div>
+      <table class="min-w-full divide-y divide-slate-100 text-sm">
+        <tbody class="divide-y divide-slate-100">
+          {% for slot in grid|dict_get:d.0 %}
+          <tr class="{% if slot.is_break %}bg-amber-50{% endif %}">
+            <td class="px-4 py-2 w-16 text-slate-400">P{{ slot.period }}</td>
+            <td class="px-4 py-2 whitespace-nowrap text-slate-500">{{ slot.start_time|time:"H:i" }}–{{ slot.end_time|time:"H:i" }}</td>
+            <td class="px-4 py-2 font-medium">{% if slot.is_break %}Break{% else %}{{ slot.subject|default:"—" }}{% endif %}</td>
+            <td class="px-4 py-2 text-slate-500">{{ slot.teacher|default:"" }}</td>
+            <td class="px-4 py-2 text-slate-400">{{ slot.room }}</td>
+            <td class="px-4 py-2 text-right">
+              <form method="post" action="{% url 'routine_slot_delete' slot.pk %}" onsubmit="return confirm('Remove this slot?')">
+                {% csrf_token %}
+                <button class="text-xs text-red-500 hover:text-red-700">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}<tr><td colspan="6" class="px-4 py-4 text-center text-slate-300">No periods yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Add-slot form -->
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5 h-fit lg:sticky lg:top-4">
+    <h3 class="text-sm font-semibold text-slate-800 mb-4">Add a period</h3>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form.visible_fields %}
+      <div>
+        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">{{ field.label }}</label>
+        {{ field|field_input }}
+        {% for e in field.errors %}<p class="mt-1 text-xs text-red-600">{{ e }}</p>{% endfor %}
+      </div>
+      {% endfor %}
+      <button class="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Add slot</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

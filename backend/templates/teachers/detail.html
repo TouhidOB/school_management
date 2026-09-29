@@ -1,0 +1,35 @@
+{% extends "base_app.html" %}
+{% block page_title %}{{ t }}{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">{{ t }}</h2>
+  <a href="{% url 'teacher_edit' t.pk %}" class="rounded-lg bg-white px-4 py-2 text-sm ring-1 ring-slate-200 hover:bg-slate-50">Edit</a>
+</div>
+<div class="grid gap-6 lg:grid-cols-3">
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5 lg:col-span-2">
+    <h3 class="font-semibold text-slate-800 mb-3">Profile</h3>
+    <dl class="grid grid-cols-2 gap-y-3 text-sm">
+      <dt class="text-slate-500">Designation</dt><dd>{{ t.designation|default:"—" }}</dd>
+      <dt class="text-slate-500">Employee ID</dt><dd>{{ t.employee_id|default:"—" }}</dd>
+      <dt class="text-slate-500">Email</dt><dd>{{ t.user.email }}</dd>
+      <dt class="text-slate-500">Contract</dt><dd>{{ t.get_contract_type_display }}</dd>
+      <dt class="text-slate-500">Joined</dt><dd>{{ t.joining_date|default:"—" }}</dd>
+      <dt class="text-slate-500">Subjects</dt><dd>{% for s in t.subjects.all %}{{ s.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
+      <dt class="text-slate-500">Status</dt><dd>{{ t.get_status_display }}</dd>
+    </dl>
+  </div>
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <h3 class="font-semibold text-slate-800 mb-3">Rating summary</h3>
+    {% if agg and agg.is_publicly_visible %}
+    <p class="text-3xl font-bold text-slate-900">{{ agg.avg_overall|floatformat:1 }}<span class="text-base text-slate-400">/5</span></p>
+    <p class="text-xs text-slate-400">from {{ agg.total_ratings_count }} ratings</p>
+    {% else %}<p class="text-sm text-slate-400">Not enough ratings yet (need 5+).</p>{% endif %}
+  </div>
+</div>
+<div class="mt-6 rounded-xl bg-white ring-1 ring-slate-200 p-5">
+  <h3 class="font-semibold text-slate-800 mb-3">Classrooms</h3>
+  <div class="grid gap-3 sm:grid-cols-3">
+    {% for r in rooms %}<a href="{% url 'room_detail' r.pk %}" class="rounded-lg border border-slate-200 p-3 hover:border-brand-300 text-sm font-medium">{{ r.name }}</a>{% empty %}<p class="text-slate-400 text-sm">None.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

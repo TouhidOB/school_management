@@ -1,0 +1,43 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}Staff Attendance{% endblock %}
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+  <h2 class="text-xl font-semibold text-slate-800">Staff attendance</h2>
+  {% if day %}<span class="text-sm text-slate-500">{{ present_count }} / {{ total }} present</span>{% endif %}
+</div>
+
+<form method="get" class="mb-6 flex flex-wrap items-end gap-3">
+  <div><label class="block text-xs text-slate-500 mb-1">Date</label>
+    <input type="date" name="date" value="{{ day }}" class="rounded-lg border-slate-300 text-sm"></div>
+  <button class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900">Load</button>
+</form>
+
+<form method="post" class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+  {% csrf_token %}
+  <input type="hidden" name="date" value="{{ day }}">
+  <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr>
+      <th class="px-4 py-3">Employee</th><th class="px-4 py-3">Teacher</th>
+      <th class="px-4 py-3">Present</th><th class="px-4 py-3">Check-in</th><th class="px-4 py-3">Check-out</th>
+    </tr></thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for t in teachers %}
+      {% with cur=existing|dict_get:t.pk %}
+      <tr>
+        <td class="px-4 py-2 text-slate-500">{{ t.employee_id|default:"—" }}</td>
+        <td class="px-4 py-2 font-medium">{{ t }}</td>
+        <td class="px-4 py-2">
+          <input type="checkbox" name="present_{{ t.pk }}" class="h-4 w-4 rounded border-slate-300"
+                 {% if cur.is_present or not cur %}checked{% endif %}>
+        </td>
+        <td class="px-4 py-2"><input type="time" name="in_{{ t.pk }}" value="{{ cur.check_in|time:'H:i'|default:'' }}" class="rounded-lg border-slate-300 text-sm"></td>
+        <td class="px-4 py-2"><input type="time" name="out_{{ t.pk }}" value="{{ cur.check_out|time:'H:i'|default:'' }}" class="rounded-lg border-slate-300 text-sm"></td>
+      </tr>
+      {% endwith %}
+      {% empty %}<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">No active teachers.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  {% if teachers %}<div class="p-4"><button class="rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white hover:bg-brand-700">Save attendance</button></div>{% endif %}
+</form>
+{% endblock %}

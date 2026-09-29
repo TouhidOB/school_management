@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ID Card — {{ s.full_name }}</title>
+  <style>
+    :root{ --brand:{{ school.primary_color|default:"#4f46e5" }}; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; background:#e5e7eb; font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    .toolbar{ display:flex; gap:10px; justify-content:center; padding:20px; }
+    .btn{ border:0; border-radius:8px; padding:9px 16px; font-size:14px; font-weight:600; cursor:pointer; text-decoration:none; }
+    .btn-print{ background:var(--brand); color:#fff; } .btn-back{ background:#fff; color:#1f2937; border:1px solid #d1d5db; }
+    .wrap{ display:flex; justify-content:center; padding:0 12px 40px; }
+    /* CR80 card ratio, scaled up for print clarity */
+    .card{ width:320px; height:510px; background:#fff; border-radius:16px; overflow:hidden;
+      box-shadow:0 12px 30px rgba(0,0,0,.18); display:flex; flex-direction:column; }
+    .head{ background:var(--brand); color:#fff; padding:16px; text-align:center; }
+    .head .logo{ height:40px; margin-bottom:6px; }
+    .head .sname{ font-size:16px; font-weight:800; line-height:1.2; }
+    .head .tag{ font-size:10px; opacity:.85; letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+    .photo{ width:120px; height:140px; margin:18px auto 8px; border-radius:10px; object-fit:cover;
+      border:3px solid var(--brand); background:#f1f5f9; display:block; }
+    .ph-fallback{ display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:800; color:var(--brand); }
+    .name{ text-align:center; font-size:19px; font-weight:800; color:#111827; }
+    .role{ text-align:center; font-size:11px; color:#6b7280; text-transform:uppercase; letter-spacing:1px; }
+    .rows{ padding:14px 22px; font-size:12.5px; color:#374151; }
+    .row{ display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px dashed #e5e7eb; }
+    .row .k{ color:#6b7280; }
+    .foot{ margin-top:auto; display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:#f8fafc; }
+    #qr{ width:66px; height:66px; }
+    .idno{ font-size:11px; color:#6b7280; } .idno b{ color:#111827; }
+    @media print{ @page{ margin:8mm; } body{ background:#fff; } .toolbar{ display:none; }
+      .card{ box-shadow:none; border:1px solid #cbd5e1; } }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="{% url 'student_detail' s.pk %}" class="btn btn-back">← Back</a>
+    <button onclick="window.print()" class="btn btn-print">🖨 Print / Save PDF</button>
+  </div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="head">
+        {% if school.logo %}<img src="{{ school.logo.url }}" class="logo" alt="">{% endif %}
+        <div class="sname">{{ school.name }}</div>
+        <div class="tag">Student Identity Card</div>
+      </div>
+
+      {% if s.photo %}
+      <img src="{{ s.photo.url }}" class="photo" alt="">
+      {% else %}
+      <div class="photo ph-fallback">{{ s.full_name|first|upper }}</div>
+      {% endif %}
+      <div class="name">{{ s.full_name }}</div>
+      <div class="role">Student</div>
+
+      <div class="rows">
+        <div class="row"><span class="k">Class</span><span>{{ s.current_class.name|default:"—" }}{% if s.current_section %} · {{ s.current_section.name }}{% endif %}</span></div>
+        <div class="row"><span class="k">Roll</span><span>{{ s.roll_number|default:"—" }}</span></div>
+        <div class="row"><span class="k">Admission No</span><span>{{ s.admission_number }}</span></div>
+        <div class="row"><span class="k">Blood Group</span><span>{{ s.blood_group|default:"—" }}</span></div>
+        <div class="row"><span class="k">Session</span><span>{{ s.academic_year.name|default:"—" }}</span></div>
+      </div>
+
+      <div class="foot">
+        <div class="idno">ID: <b>{{ s.admission_number }}</b><br>{{ school.phone }}</div>
+        <div id="qr"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script>
+    try {
+      new QRCode(document.getElementById("qr"), {
+        text: "{{ school.slug }}|{{ s.admission_number }}|{{ s.full_name|escapejs }}",
+        width: 66, height: 66, correctLevel: QRCode.CorrectLevel.M });
+    } catch(e) {}
+  </script>
+</body>
+</html>

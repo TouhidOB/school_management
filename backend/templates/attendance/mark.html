@@ -1,0 +1,45 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}Attendance{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">Mark attendance</h2>
+<form method="get" class="mb-6 flex flex-wrap items-end gap-3">
+  <div><label class="block text-xs text-slate-500 mb-1">Section</label>
+    <select name="section" class="rounded-lg border-slate-300 text-sm">
+      <option value="">Choose…</option>
+      {% for s in sections %}<option value="{{ s.pk }}" {% if section and section.pk == s.pk %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select></div>
+  <div><label class="block text-xs text-slate-500 mb-1">Date</label><input type="date" name="date" value="{{ day }}" class="rounded-lg border-slate-300 text-sm"></div>
+  <button class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900">Load</button>
+</form>
+
+{% if section %}
+<form method="post" class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+  {% csrf_token %}
+  <input type="hidden" name="section" value="{{ section.pk }}">
+  <input type="hidden" name="date" value="{{ day }}">
+  <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Roll</th><th class="px-4 py-3">Student</th><th class="px-4 py-3">Status</th></tr></thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for s in students %}
+      <tr>
+        <td class="px-4 py-2 text-slate-500">{{ s.roll_number }}</td>
+        <td class="px-4 py-2 font-medium">{{ s.full_name }}</td>
+        <td class="px-4 py-2">
+          {% with cur=existing|dict_get:s.pk %}
+          <select name="status_{{ s.pk }}" class="rounded-lg border-slate-300 text-sm">
+            <option value="present" {% if cur == 'present' or not cur %}selected{% endif %}>Present</option>
+            <option value="absent" {% if cur == 'absent' %}selected{% endif %}>Absent</option>
+            <option value="late" {% if cur == 'late' %}selected{% endif %}>Late</option>
+            <option value="leave" {% if cur == 'leave' %}selected{% endif %}>On Leave</option>
+          </select>
+          {% endwith %}
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="3" class="px-4 py-8 text-center text-slate-400">No students in this section.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  {% if students %}<div class="p-4"><button class="rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white hover:bg-brand-700">Save attendance</button></div>{% endif %}
+</form>
+{% endif %}
+{% endblock %}

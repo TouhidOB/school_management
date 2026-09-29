@@ -1,0 +1,15 @@
+{% extends "base_app.html" %}
+{% block page_title %}Notifications{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">Notifications</h2>
+<div class="space-y-2">
+  {% for n in notes %}
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-4">
+    <div class="flex justify-between"><p class="font-medium text-slate-800">{{ n.title|default:n.get_channel_display }}</p><span class="text-xs text-slate-400">{{ n.created_at|date:"M d, H:i" }}</span></div>
+    <p class="text-sm text-slate-600 mt-1">{{ n.body }}</p>
+  </div>
+  {% empty %}<p class="text-slate-400">No notifications.</p>{% endfor %}
+</div>
+
+{% include "partials/_pagination.html" %}
+{% endblock %}

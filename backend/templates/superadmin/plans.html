@@ -1,0 +1,18 @@
+{% extends "base_app.html" %}
+{% block page_title %}Plans{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">Subscription plans</h2>
+  <a href="{% url 'plan_create' %}" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">+ New plan</a>
+</div>
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {% for p in plans %}
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <div class="flex items-center justify-between"><h3 class="font-semibold text-slate-800">{{ p.name }}</h3><a href="{% url 'plan_edit' p.pk %}" class="text-sm text-brand-600 hover:underline">Edit</a></div>
+    <p class="mt-2 text-2xl font-bold text-slate-900">${{ p.price_monthly }}<span class="text-sm font-normal text-slate-400">/mo</span></p>
+    <p class="text-sm text-slate-500">{{ p.student_limit|default:"Unlimited" }} students · {{ p.get_tier_display }}</p>
+    <p class="mt-2 text-xs {% if p.is_active %}text-green-600{% else %}text-slate-400{% endif %}">{% if p.is_active %}Active{% else %}Inactive{% endif %}</p>
+  </div>
+  {% empty %}<p class="text-slate-400">No plans yet. Create the first.</p>{% endfor %}
+</div>
+{% endblock %}

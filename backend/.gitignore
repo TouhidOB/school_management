@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.env
+db.sqlite3
+media/
+staticfiles/
+.DS_Store
+*.log
+.venv/
+venv/
+backups/
+scripts/rclone.conf

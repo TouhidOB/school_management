@@ -1,0 +1,33 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}{{ heading }}{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">{{ heading }}</h2>
+
+<div class="space-y-4">
+  {% for d in days %}
+  {% with rows=grid|dict_get:d.0 %}
+  {% if rows %}
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+    <div class="bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">{{ d.1 }}</div>
+    <table class="min-w-full divide-y divide-slate-100 text-sm">
+      <tbody class="divide-y divide-slate-100">
+        {% for slot in rows %}
+        <tr class="{% if slot.is_break %}bg-amber-50{% endif %}">
+          <td class="px-4 py-2 w-16 text-slate-400">P{{ slot.period }}</td>
+          <td class="px-4 py-2 whitespace-nowrap text-slate-500">{{ slot.start_time|time:"H:i" }}–{{ slot.end_time|time:"H:i" }}</td>
+          <td class="px-4 py-2 font-medium">{% if slot.is_break %}Break{% else %}{{ slot.subject|default:"—" }}{% endif %}</td>
+          {% if show_teacher %}<td class="px-4 py-2 text-slate-500">{{ slot.teacher|default:"" }}</td>
+          {% else %}<td class="px-4 py-2 text-slate-500">{{ slot.section }}</td>{% endif %}
+          <td class="px-4 py-2 text-slate-400">{{ slot.room }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% endwith %}
+  {% empty %}<p class="text-slate-400">No routine yet.</p>{% endfor %}
+  {% if not grid %}<div class="rounded-xl bg-white ring-1 ring-slate-200 p-8 text-center text-slate-400">Your routine hasn't been set up yet.</div>{% endif %}
+</div>
+{% endblock %}

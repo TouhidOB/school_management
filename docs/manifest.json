@@ -1,0 +1,602 @@
+[
+  {
+    "file": "home",
+    "section": "Public Website",
+    "title": "Home / Landing",
+    "role": "Public",
+    "path": "/",
+    "desc": "Marketing landing page: value proposition, feature highlights, per-student pricing and a Contact call-to-action."
+  },
+  {
+    "file": "features",
+    "section": "Public Website",
+    "title": "Features",
+    "role": "Public",
+    "path": "/features/",
+    "desc": "Grid of the twelve platform modules available to every school."
+  },
+  {
+    "file": "pricing",
+    "section": "Public Website",
+    "title": "Pricing",
+    "role": "Public",
+    "path": "/pricing/",
+    "desc": "Flat pricing (\u09f310 per student, manual payment) with an inclusions list."
+  },
+  {
+    "file": "pub_admissions",
+    "section": "Public Website",
+    "title": "Admissions Directory",
+    "role": "Public",
+    "path": "/admissions/",
+    "desc": "Searchable directory of every school currently accepting online admissions."
+  },
+  {
+    "file": "pub_admission_apply",
+    "section": "Public Website",
+    "title": "Online Admission Form",
+    "role": "Public",
+    "path": "/admissions/demo/apply/",
+    "desc": "A school's public application form; classes come from that school's own class list."
+  },
+  {
+    "file": "pub_admission_track",
+    "section": "Public Website",
+    "title": "Track Application",
+    "role": "Public",
+    "path": "/admissions/track/QWLK57PRnLSM0yI3MjVZdVba/",
+    "desc": "Applicant status page reached with the unguessable tracking token."
+  },
+  {
+    "file": "pub_admit_card",
+    "section": "Public Website",
+    "title": "Admit Card",
+    "role": "Public",
+    "path": "/admissions/track/QWLK57PRnLSM0yI3MjVZdVba/admit-card/",
+    "desc": "Printable admit card issued to the applicant on submission."
+  },
+  {
+    "file": "leaderboard",
+    "section": "Public Website",
+    "title": "Top Teachers Leaderboard",
+    "role": "Public",
+    "path": "/leaderboard/",
+    "desc": "Platform-wide ranking of top-rated teachers (photo, name, school, rating). Needs 5+ ratings."
+  },
+  {
+    "file": "school_leaderboard",
+    "section": "Public Website",
+    "title": "Top Schools Leaderboard",
+    "role": "Public",
+    "path": "/schools-leaderboard/",
+    "desc": "Schools ranked by the average of their teachers' ratings (logo, name, address, rating)."
+  },
+  {
+    "file": "contact",
+    "section": "Public Website",
+    "title": "Contact",
+    "role": "Public",
+    "path": "/contact/",
+    "desc": "Enquiry form; submissions become leads on the Super Admin dashboard. Shows phone, email and topic."
+  },
+  {
+    "file": "login",
+    "section": "Public Website",
+    "title": "Sign In",
+    "role": "Public",
+    "path": "/login/",
+    "desc": "Single sign-in for every role; routing to the right dashboard happens after login."
+  },
+  {
+    "file": "sa_dashboard",
+    "section": "Super Admin",
+    "title": "Platform Dashboard",
+    "role": "super",
+    "path": "/app/",
+    "desc": "Platform KPIs (schools, students, revenue), the Contact-messages inbox with clickable phone, and recent schools."
+  },
+  {
+    "file": "sa_schools",
+    "section": "Super Admin",
+    "title": "Schools",
+    "role": "super",
+    "path": "/app/schools/",
+    "desc": "All tenant schools with search and status filter; entry point to create or manage a school."
+  },
+  {
+    "file": "sa_school_detail",
+    "section": "Super Admin",
+    "title": "School Detail",
+    "role": "super",
+    "path": "/app/schools/1/",
+    "desc": "A tenant's profile, stats and status controls, plus 'Manage this school' to enter its workspace."
+  },
+  {
+    "file": "sa_school_create",
+    "section": "Super Admin",
+    "title": "Create School",
+    "role": "super",
+    "path": "/app/schools/create/",
+    "desc": "Manually provision a school + admin login, device brand and API key."
+  },
+  {
+    "file": "sa_leads",
+    "section": "Super Admin",
+    "title": "Contact Messages",
+    "role": "super",
+    "path": "/app/leads/",
+    "desc": "Full CRUD over contact leads: search, filter, phone/email links, handle/convert/delete."
+  },
+  {
+    "file": "sa_lead_detail",
+    "section": "Super Admin",
+    "title": "Contact Message Detail",
+    "role": "super",
+    "path": "/app/leads/3/",
+    "desc": "One lead in full, with convert-to-school, handled toggle, edit and delete."
+  },
+  {
+    "file": "sa_plans",
+    "section": "Super Admin",
+    "title": "Subscription Plans",
+    "role": "super",
+    "path": "/app/plans/",
+    "desc": "Manage subscription plan definitions."
+  },
+  {
+    "file": "ad_dashboard",
+    "section": "School Admin",
+    "title": "Dashboard",
+    "role": "admin",
+    "path": "/app/",
+    "desc": "Overview: student/teacher/room counts, fees collected, recent students and quick actions."
+  },
+  {
+    "file": "ad_onboarding",
+    "section": "School Admin",
+    "title": "Setup Wizard",
+    "role": "admin",
+    "path": "/app/onboarding/",
+    "desc": "Guided checklist to get the school configured."
+  },
+  {
+    "file": "ad_teachers",
+    "section": "School Admin",
+    "title": "Teachers",
+    "role": "admin",
+    "path": "/app/teachers/",
+    "desc": "Teacher directory with search (name/email/ID) and filters (designation, status)."
+  },
+  {
+    "file": "ad_teacher_create",
+    "section": "School Admin",
+    "title": "Add Teacher",
+    "role": "admin",
+    "path": "/app/teachers/create/",
+    "desc": "Create a teacher: account details, designation, subjects, sections and status."
+  },
+  {
+    "file": "ad_teacher_detail",
+    "section": "School Admin",
+    "title": "Teacher Detail",
+    "role": "admin",
+    "path": "/app/teachers/1/",
+    "desc": "Teacher profile, rating summary and assigned classrooms."
+  },
+  {
+    "file": "ad_designations",
+    "section": "School Admin",
+    "title": "Designations",
+    "role": "admin",
+    "path": "/app/designations/",
+    "desc": "Per-school staff designation ladder used for the teacher hierarchy."
+  },
+  {
+    "file": "ad_students",
+    "section": "School Admin",
+    "title": "Students",
+    "role": "admin",
+    "path": "/app/students/",
+    "desc": "Student directory with search and class/section/status filters."
+  },
+  {
+    "file": "ad_student_create",
+    "section": "School Admin",
+    "title": "Add Student",
+    "role": "admin",
+    "path": "/app/students/create/",
+    "desc": "Full student admission form."
+  },
+  {
+    "file": "ad_student_detail",
+    "section": "School Admin",
+    "title": "Student Detail",
+    "role": "admin",
+    "path": "/app/students/1/",
+    "desc": "Profile, guardians, invoices, results, plus actions: ID card, admission slip, login, certificate."
+  },
+  {
+    "file": "ad_student_credentials",
+    "section": "School Admin",
+    "title": "Student Portal Login",
+    "role": "admin",
+    "path": "/app/students/1/credentials/",
+    "desc": "Issue or reset a student's portal login; the login ID is permanent."
+  },
+  {
+    "file": "ad_applications",
+    "section": "School Admin",
+    "title": "Admission Applications",
+    "role": "admin",
+    "path": "/app/admissions/",
+    "desc": "Inbox of online applications with status counters, search and filter."
+  },
+  {
+    "file": "ad_application_review",
+    "section": "School Admin",
+    "title": "Review Application",
+    "role": "admin",
+    "path": "/app/admissions/3/",
+    "desc": "Approve (placing the applicant into a class/section as a Student) or reject with a reason."
+  },
+  {
+    "file": "ad_admission_settings",
+    "section": "School Admin",
+    "title": "Admission Form Settings",
+    "role": "admin",
+    "path": "/app/admissions/settings/",
+    "desc": "Choose the online form or a downloadable PDF form, and set applicant instructions."
+  },
+  {
+    "file": "ad_certificates",
+    "section": "School Admin",
+    "title": "Certificates",
+    "role": "admin",
+    "path": "/app/certificates/",
+    "desc": "Issued certificates / testimonials / transfer certificates, searchable."
+  },
+  {
+    "file": "ad_cert_create",
+    "section": "School Admin",
+    "title": "Issue Certificate",
+    "role": "admin",
+    "path": "/app/certificates/create/",
+    "desc": "Compose a certificate with per-type default text and {placeholders}."
+  },
+  {
+    "file": "ad_years",
+    "section": "School Admin",
+    "title": "Academic Years",
+    "role": "admin",
+    "path": "/app/years/",
+    "desc": "Academic sessions; one marked current."
+  },
+  {
+    "file": "ad_classes",
+    "section": "School Admin",
+    "title": "Classes",
+    "role": "admin",
+    "path": "/app/classes/",
+    "desc": "Grade levels."
+  },
+  {
+    "file": "ad_sections",
+    "section": "School Admin",
+    "title": "Sections",
+    "role": "admin",
+    "path": "/app/sections/",
+    "desc": "Sections per class/year with an optional class teacher."
+  },
+  {
+    "file": "ad_subjects",
+    "section": "School Admin",
+    "title": "Subjects",
+    "role": "admin",
+    "path": "/app/subjects/",
+    "desc": "Subject catalog, searchable."
+  },
+  {
+    "file": "ad_routine",
+    "section": "School Admin",
+    "title": "Class Routine Builder",
+    "role": "admin",
+    "path": "/app/routine/?section=1",
+    "desc": "Weekly timetable grid per section: period, time, subject, teacher, room and break rows."
+  },
+  {
+    "file": "ad_rooms",
+    "section": "School Admin",
+    "title": "Classrooms",
+    "role": "admin",
+    "path": "/app/rooms/",
+    "desc": "Collaborative subject rooms with search and subject filter."
+  },
+  {
+    "file": "ad_myrooms",
+    "section": "School Admin",
+    "title": "Classroom Cards",
+    "role": "admin",
+    "path": "/app/my-rooms/",
+    "desc": "Card view of classrooms for the signed-in user (all rooms for admins)."
+  },
+  {
+    "file": "ad_room_detail",
+    "section": "School Admin",
+    "title": "Classroom Detail",
+    "role": "admin",
+    "path": "/app/rooms/1/",
+    "desc": "Room feed, notes, assignments and participants (tabbed)."
+  },
+  {
+    "file": "ad_assignment_detail",
+    "section": "School Admin",
+    "title": "Assignment & Grading",
+    "role": "admin",
+    "path": "/app/assignments/1/",
+    "desc": "One assignment with its submissions, marks and feedback entry."
+  },
+  {
+    "file": "ad_exams",
+    "section": "School Admin",
+    "title": "Exams",
+    "role": "admin",
+    "path": "/app/exams/",
+    "desc": "Exam sessions."
+  },
+  {
+    "file": "ad_exam_detail",
+    "section": "School Admin",
+    "title": "Exam Detail",
+    "role": "admin",
+    "path": "/app/exams/1/",
+    "desc": "Exam subjects and the entry point to marks entry."
+  },
+  {
+    "file": "ad_attendance",
+    "section": "School Admin",
+    "title": "Attendance",
+    "role": "admin",
+    "path": "/app/attendance/",
+    "desc": "Manual daily attendance by section and date."
+  },
+  {
+    "file": "ad_staff_attendance",
+    "section": "School Admin",
+    "title": "Staff Attendance",
+    "role": "admin",
+    "path": "/app/staff-attendance/",
+    "desc": "Daily staff register with per-teacher present flag, check-in and check-out."
+  },
+  {
+    "file": "ad_biometric",
+    "section": "School Admin",
+    "title": "Fingerprint IDs",
+    "role": "admin",
+    "path": "/app/biometric/",
+    "desc": "Map device fingerprint ids to students/teachers for biometric attendance."
+  },
+  {
+    "file": "ad_devices",
+    "section": "School Admin",
+    "title": "Attendance Device",
+    "role": "admin",
+    "path": "/app/devices/",
+    "desc": "Configure the biometric brand, API key, ingest URL/token and view recent punches."
+  },
+  {
+    "file": "ad_feetypes",
+    "section": "School Admin",
+    "title": "Fee Types",
+    "role": "admin",
+    "path": "/app/fee-types/",
+    "desc": "Built-in and custom fee categories."
+  },
+  {
+    "file": "ad_feestructures",
+    "section": "School Admin",
+    "title": "Fee Structures",
+    "role": "admin",
+    "path": "/app/fee-structures/",
+    "desc": "Per-class amounts for each fee type."
+  },
+  {
+    "file": "ad_invoices",
+    "section": "School Admin",
+    "title": "Invoices",
+    "role": "admin",
+    "path": "/app/invoices/",
+    "desc": "Invoices with search, status filter and receipt links."
+  },
+  {
+    "file": "ad_invoice_detail",
+    "section": "School Admin",
+    "title": "Invoice Detail",
+    "role": "admin",
+    "path": "/app/invoices/1/",
+    "desc": "Line items, totals, payment recording and receipt."
+  },
+  {
+    "file": "ad_ratings",
+    "section": "School Admin",
+    "title": "Teacher Ratings",
+    "role": "admin",
+    "path": "/app/ratings/",
+    "desc": "Ranked teacher ratings leaderboard for the school."
+  },
+  {
+    "file": "ad_periods",
+    "section": "School Admin",
+    "title": "Rating Periods",
+    "role": "admin",
+    "path": "/app/rating-periods/",
+    "desc": "Rating windows during which students can rate teachers."
+  },
+  {
+    "file": "ad_notifications",
+    "section": "School Admin",
+    "title": "Notifications",
+    "role": "admin",
+    "path": "/app/notifications/",
+    "desc": "In-app notification log."
+  },
+  {
+    "file": "ad_settings",
+    "section": "School Admin",
+    "title": "Settings",
+    "role": "admin",
+    "path": "/app/settings/",
+    "desc": "School profile summary."
+  },
+  {
+    "file": "rp_receipt",
+    "section": "Printable Reports",
+    "title": "Money Receipt",
+    "role": "admin",
+    "path": "/app/invoices/1/receipt/",
+    "desc": "Print-ready fee receipt with school branding, line items, paid/due stamp."
+  },
+  {
+    "file": "rp_idcard",
+    "section": "Printable Reports",
+    "title": "Student ID Card",
+    "role": "admin",
+    "path": "/app/students/1/id-card/",
+    "desc": "CR80 ID card with photo, class/roll, admission number and QR code."
+  },
+  {
+    "file": "rp_slip",
+    "section": "Printable Reports",
+    "title": "Admission Slip",
+    "role": "admin",
+    "path": "/app/students/1/admission-slip/",
+    "desc": "Admission slip: student info, portal login and fee schedule/balance."
+  },
+  {
+    "file": "rp_cert",
+    "section": "Printable Reports",
+    "title": "Certificate",
+    "role": "admin",
+    "path": "/app/certificates/3/print/",
+    "desc": "Ornamental printable certificate with substituted placeholders."
+  },
+  {
+    "file": "te_dashboard",
+    "section": "Teacher",
+    "title": "Dashboard",
+    "role": "teacher",
+    "path": "/app/",
+    "desc": "Teacher home: classrooms, pending grading, subjects."
+  },
+  {
+    "file": "te_rooms",
+    "section": "Teacher",
+    "title": "My Classrooms",
+    "role": "teacher",
+    "path": "/app/my-rooms/",
+    "desc": "The classrooms this teacher teaches."
+  },
+  {
+    "file": "te_routine",
+    "section": "Teacher",
+    "title": "My Teaching Routine",
+    "role": "teacher",
+    "path": "/app/my-routine/",
+    "desc": "The teacher's own weekly schedule, derived from the routine grid."
+  },
+  {
+    "file": "te_marks",
+    "section": "Teacher",
+    "title": "Marks Entry",
+    "role": "teacher",
+    "path": "/app/marks-entry/",
+    "desc": "Exams the teacher can open to enter marks."
+  },
+  {
+    "file": "te_ratings",
+    "section": "Teacher",
+    "title": "My Ratings",
+    "role": "teacher",
+    "path": "/app/my-ratings/",
+    "desc": "The teacher's own rating summary (unlocks at 5 ratings)."
+  },
+  {
+    "file": "st_dashboard",
+    "section": "Student",
+    "title": "Dashboard",
+    "role": "student",
+    "path": "/app/",
+    "desc": "Student home: upcoming assignments, fees due, classrooms."
+  },
+  {
+    "file": "st_routine",
+    "section": "Student",
+    "title": "My Class Routine",
+    "role": "student",
+    "path": "/app/my-routine/",
+    "desc": "The student's section timetable with subject, teacher and room."
+  },
+  {
+    "file": "st_assignments",
+    "section": "Student",
+    "title": "Assignments",
+    "role": "student",
+    "path": "/app/my-assignments/",
+    "desc": "Assignments with submission status."
+  },
+  {
+    "file": "st_results",
+    "section": "Student",
+    "title": "Results",
+    "role": "student",
+    "path": "/app/my-results/",
+    "desc": "Published exam results."
+  },
+  {
+    "file": "st_invoices",
+    "section": "Student",
+    "title": "Fees",
+    "role": "student",
+    "path": "/app/my-invoices/",
+    "desc": "The student's invoices with receipt links."
+  },
+  {
+    "file": "st_rate",
+    "section": "Student",
+    "title": "Rate Teachers",
+    "role": "student",
+    "path": "/app/rate-teachers/",
+    "desc": "Anonymous 6-dimension teacher rating form."
+  },
+  {
+    "file": "pa_dashboard",
+    "section": "Parent",
+    "title": "Dashboard",
+    "role": "parent",
+    "path": "/app/",
+    "desc": "Parent home: child cards linking to attendance, results and fees."
+  },
+  {
+    "file": "pa_attendance",
+    "section": "Parent",
+    "title": "Attendance",
+    "role": "parent",
+    "path": "/app/child/attendance/",
+    "desc": "Child attendance calendar."
+  },
+  {
+    "file": "pa_results",
+    "section": "Parent",
+    "title": "Results",
+    "role": "parent",
+    "path": "/app/child/results/",
+    "desc": "Child exam results."
+  },
+  {
+    "file": "pa_invoices",
+    "section": "Parent",
+    "title": "Fees",
+    "role": "parent",
+    "path": "/app/child/invoices/",
+    "desc": "Child invoices with receipt links."
+  }
+]

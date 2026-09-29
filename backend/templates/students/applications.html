@@ -1,0 +1,63 @@
+{% extends "base_app.html" %}
+{% block page_title %}Admissions{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+  <h2 class="text-xl font-semibold text-slate-800">Admission applications</h2>
+  <div class="flex items-center gap-2">
+    <a href="{% url 'admission_settings' %}" class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50">Form settings</a>
+    <form method="post" action="{% url 'admissions_toggle' %}">{% csrf_token %}
+      {% if school.admissions_open %}
+      <button class="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700">● Admissions OPEN — close</button>
+      {% else %}
+      <button class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">○ Closed — open</button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<div class="mb-4 grid gap-4 sm:grid-cols-4">
+  {% include "partials/_stat.html" with label="Total registrations" value=total %}
+  {% include "partials/_stat.html" with label="Pending" value=pending %}
+  {% include "partials/_stat.html" with label="Approved" value=approved %}
+  {% include "partials/_stat.html" with label="Rejected" value=rejected %}
+</div>
+
+{% if school.admissions_open %}
+<div class="mb-4 rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-700 ring-1 ring-brand-100">
+  Public application link: <a href="{% url 'admission_apply' school.slug %}" target="_blank" class="font-medium underline">{{ request.scheme }}://{{ request.get_host }}{% url 'admission_apply' school.slug %}</a>
+</div>
+{% endif %}
+
+<form method="get" class="mb-4 flex flex-wrap items-end gap-3 rounded-xl bg-white ring-1 ring-slate-200 p-3">
+  <div class="flex-1 min-w-[200px]">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search applicant or guardian…" class="form-control">
+  </div>
+  <select name="status" onchange="this.form.submit()" class="form-select">
+    <option value="">All</option>
+    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+    <option value="approved" {% if status == 'approved' %}selected{% endif %}>Approved</option>
+    <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>Rejected</option>
+  </select>
+  <button class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Search</button>
+</form>
+
+<div class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr>
+      <th class="px-4 py-3">Applicant</th><th class="px-4 py-3">Class</th><th class="px-4 py-3">Phone</th><th class="px-4 py-3">Applied</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th></tr></thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for a in applications %}
+      <tr class="hover:bg-slate-50">
+        <td class="px-4 py-3"><a href="{% url 'application_review' a.pk %}" class="font-medium text-brand-700 hover:underline">{{ a.full_name }}</a>{% if a.guardian_name %}<span class="block text-xs text-slate-400">{{ a.guardian_name }}</span>{% endif %}</td>
+        <td class="px-4 py-3 text-slate-600">{{ a.class_applied|default:"—" }}</td>
+        <td class="px-4 py-3">{% if a.phone %}<a href="tel:{{ a.phone }}" class="text-green-700 hover:underline">{{ a.phone }}</a>{% else %}—{% endif %}</td>
+        <td class="px-4 py-3 text-slate-400 text-xs">{{ a.created_at|date:"M d, H:i" }}</td>
+        <td class="px-4 py-3"><span class="rounded-full px-2 py-0.5 text-xs {% if a.status == 'approved' %}bg-green-50 text-green-700{% elif a.status == 'rejected' %}bg-red-50 text-red-700{% else %}bg-amber-50 text-amber-700{% endif %}">{{ a.get_status_display }}</span></td>
+        <td class="px-4 py-3 text-right"><a href="{% url 'application_review' a.pk %}" class="text-brand-600 hover:underline">Review →</a></td>
+      </tr>
+      {% empty %}<tr><td colspan="6" class="px-4 py-12 text-center text-slate-400">No applications yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/_pagination.html" %}
+{% endblock %}

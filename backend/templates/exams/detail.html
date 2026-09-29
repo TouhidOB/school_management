@@ -1,0 +1,64 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}{{ exam.name }}{% endblock %}
+{% block content %}
+<div class="mb-6 flex flex-wrap items-start justify-between gap-3">
+  <div>
+    <a href="{% url 'exam_list' %}" class="text-sm text-slate-500 hover:text-brand-600">← Exams</a>
+    <h2 class="text-xl font-semibold text-slate-800 mt-1">{{ exam.name }}
+      {% if exam.is_final %}<span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 align-middle">Final exam</span>{% endif %}
+    </h2>
+    <p class="text-sm text-slate-500">{{ exam.academic_year.name }}
+      {% if exam.start_date %}· {{ exam.start_date }} → {{ exam.end_date }}{% endif %}</p>
+  </div>
+  <div class="flex flex-wrap gap-2 text-sm">
+    <a href="{% url 'exam_routine' exam.pk %}" class="rounded-lg bg-white px-3 py-2 ring-1 ring-slate-200 hover:bg-slate-50">🗓 Exam routine</a>
+    <a href="{% url 'exam_admit_cards' exam.pk %}" class="rounded-lg bg-white px-3 py-2 ring-1 ring-slate-200 hover:bg-slate-50">🎫 Admit cards</a>
+    <a href="{% url 'exam_merit' exam.pk %}" class="rounded-lg bg-white px-3 py-2 ring-1 ring-slate-200 hover:bg-slate-50">🏆 Merit list & transcripts</a>
+    {% if exam.is_final %}
+    <a href="{% url 'exam_promote' exam.pk %}" class="rounded-lg bg-brand-600 px-3 py-2 font-medium text-white hover:bg-brand-700">Promote students →</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2 rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+    <h3 class="font-semibold text-slate-800 px-5 pt-5 pb-3">Subjects & schedule</h3>
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500">
+        <tr>
+          <th class="px-5 py-2">Subject</th><th class="px-3 py-2">Class</th>
+          <th class="px-3 py-2">Date · time</th><th class="px-3 py-2">Hall</th>
+          <th class="px-3 py-2">Guard teacher</th><th class="px-3 py-2"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for es in subjects %}
+        <tr>
+          <td class="px-5 py-2 font-medium">{{ es.subject.name }}
+            <span class="text-xs text-slate-400">{{ es.subject.code }}</span></td>
+          <td class="px-3 py-2 text-slate-500">{{ es.school_class.name }}</td>
+          <td class="px-3 py-2 text-slate-500">
+            {{ es.exam_date|default:"—" }}
+            {% if es.start_time %}<br><span class="text-xs">{{ es.start_time|time:"g:i A" }}–{{ es.end_time|time:"g:i A" }}</span>{% endif %}
+          </td>
+          <td class="px-3 py-2 text-slate-500">{{ es.exam_room|default:"—" }}</td>
+          <td class="px-3 py-2 text-slate-500">{{ es.invigilator|default:"—" }}</td>
+          <td class="px-3 py-2 text-right whitespace-nowrap">
+            <a href="{% url 'marks_entry' es.pk %}" class="text-brand-600 hover:underline">Enter marks →</a>
+          </td>
+        </tr>
+        {% empty %}<tr><td colspan="6" class="px-5 py-6 text-slate-400">No subjects added yet — add the first paper on the right.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5 h-fit">
+    <h3 class="font-semibold text-slate-800 mb-3">Add subject / routine row</h3>
+    <form method="post" class="space-y-3">
+      {% csrf_token %}
+      {% for f in form.visible_fields %}<div><label class="block text-xs text-slate-500 mb-1">{{ f.label }}</label>{{ f|field_input }}{% if f.errors %}<p class="mt-1 text-xs text-rose-600">{{ f.errors.0 }}</p>{% endif %}</div>{% endfor %}
+      <button class="w-full rounded-lg bg-brand-600 py-2 text-sm font-medium text-white hover:bg-brand-700">Add</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

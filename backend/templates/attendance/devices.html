@@ -1,0 +1,83 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}Attendance Device{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-1">Fingerprint attendance device</h2>
+<p class="text-sm text-slate-500 mb-6">Configure your biometric machine and connect it to EduNest.</p>
+
+<div class="grid gap-6 lg:grid-cols-3">
+  <!-- Settings -->
+  <div class="lg:col-span-1 rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <h3 class="font-semibold text-slate-800 mb-4">Settings</h3>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {% for f in form.visible_fields %}
+      <div>
+        <label class="form-label">{{ f.label }}</label>
+        {{ f|field_input }}
+        {% if f.help_text %}<p class="mt-1 text-xs text-slate-400">{{ f.help_text }}</p>{% endif %}
+      </div>
+      {% endfor %}
+      <button name="action" value="save" class="w-full rounded-lg bg-brand-600 py-2 text-sm font-medium text-white hover:bg-brand-700">Save settings</button>
+    </form>
+  </div>
+
+  <!-- Connection -->
+  <div class="lg:col-span-2 space-y-6">
+    <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5">
+      <h3 class="font-semibold text-slate-800 mb-4">Device connection</h3>
+      {% if school.device_brand == 'none' %}
+      <div class="rounded-lg bg-amber-50 p-4 text-sm text-amber-700 ring-1 ring-amber-200">
+        No device brand selected yet. Choose one on the left to enable biometric attendance.
+      </div>
+      {% else %}
+      <dl class="space-y-3 text-sm">
+        <div class="flex justify-between gap-4"><dt class="text-slate-500">Brand</dt><dd class="font-medium">{{ school.get_device_brand_display }}</dd></div>
+        <div>
+          <dt class="text-slate-500 mb-1">Ingest URL (POST punches here)</dt>
+          <dd><code class="block break-all rounded-lg bg-slate-50 p-2 text-xs ring-1 ring-slate-200">{{ ingest_url }}</code></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 mb-1">Device token (header <code>X-Device-Token</code>)</dt>
+          <dd class="flex items-center gap-2">
+            <code class="flex-1 break-all rounded-lg bg-slate-50 p-2 text-xs ring-1 ring-slate-200">{{ school.device_token }}</code>
+            <form method="post" onsubmit="return confirm('Regenerate token? The old one stops working.')">
+              {% csrf_token %}
+              <button name="action" value="regenerate" class="whitespace-nowrap rounded-lg bg-white px-3 py-2 text-xs font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Regenerate</button>
+            </form>
+          </dd>
+        </div>
+      </dl>
+      <div class="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
+        Point your device (or its middleware) at the ingest URL with the token header.
+        Map each device user id to a student or teacher under
+        <a href="{% url 'enrollment_list' %}" class="text-brand-600 hover:underline">Fingerprint IDs</a>.
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-semibold text-slate-800">Recent punches</h3>
+        <div class="text-xs text-slate-500">{{ enrolled }} enrolled · {% if unresolved %}<span class="text-red-600 font-medium">{{ unresolved }} unresolved</span>{% else %}0 unresolved{% endif %}</div>
+      </div>
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-xs uppercase text-slate-500"><tr><th class="py-2">Device ID</th><th class="py-2">Time</th><th class="py-2">Dir</th><th class="py-2">Status</th><th class="py-2"></th></tr></thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for p in punches %}
+          <tr>
+            <td class="py-2 font-medium">{{ p.device_user_id }}</td>
+            <td class="py-2 text-slate-500">{{ p.punched_at|date:"M d, H:i" }}</td>
+            <td class="py-2 text-slate-500">{{ p.direction }}</td>
+            <td class="py-2">
+              <span class="rounded-full px-2 py-0.5 text-xs {% if p.status == 'applied' %}bg-green-50 text-green-700{% elif p.status == 'unresolved' %}bg-amber-50 text-amber-700{% else %}bg-red-50 text-red-700{% endif %}">{{ p.get_status_display }}</span>
+            </td>
+            <td class="py-2 text-right">{% if p.status == 'unresolved' %}<a href="{% url 'enrollment_create' %}?device_user_id={{ p.device_user_id }}" class="text-brand-600 hover:underline text-xs">Enroll</a>{% endif %}</td>
+          </tr>
+          {% empty %}<tr><td colspan="5" class="py-6 text-center text-slate-400">No punches received yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

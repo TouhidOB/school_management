@@ -1,0 +1,35 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}Add school{% endblock %}
+{% block content %}
+<div class="mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">Provision a new school</h2>
+  <p class="text-sm text-slate-500">Creates the tenant and its admin login. Billing is manual (৳10 / student).</p>
+</div>
+
+{% if lead %}
+<div class="mb-5 max-w-2xl rounded-xl bg-brand-50 p-4 text-sm text-brand-700 ring-1 ring-brand-100">
+  Converting lead from <strong>{{ lead.name }}</strong> ({{ lead.email }}). It will be marked handled on creation.
+</div>
+{% endif %}
+
+<div class="max-w-2xl rounded-xl bg-white ring-1 ring-slate-200 p-6">
+  <form method="post" class="grid gap-5 sm:grid-cols-2">
+    {% csrf_token %}
+    {% if lead %}<input type="hidden" name="lead_id" value="{{ lead.pk }}">{% endif %}
+    {% if form.non_field_errors %}<div class="sm:col-span-2 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ form.non_field_errors }}</div>{% endif %}
+    {% for field in form.visible_fields %}
+    <div class="{% if field.name == 'admin_email' or field.name == 'school_name' %}sm:col-span-2{% endif %}">
+      <label class="form-label">{{ field.label }}{% if field.field.required %}<span class="text-red-500">*</span>{% endif %}</label>
+      {{ field|field_input }}
+      {% if field.help_text %}<p class="mt-1 text-xs text-slate-400">{{ field.help_text }}</p>{% endif %}
+      {% for e in field.errors %}<p class="mt-1 text-xs text-red-600">{{ e }}</p>{% endfor %}
+    </div>
+    {% endfor %}
+    <div class="sm:col-span-2 flex items-center gap-3 pt-1">
+      <button class="rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white hover:bg-brand-700">Create school</button>
+      <a href="{% url 'tenant_list' %}" class="text-sm text-slate-500 hover:text-slate-700">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

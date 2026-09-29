@@ -1,0 +1,43 @@
+{% extends "base_app.html" %}
+{% block page_title %}Schools{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h2 class="text-xl font-semibold text-slate-800">All schools</h2>
+  <a href="{% url 'school_create' %}" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">+ New school</a>
+</div>
+
+<form method="get" class="mb-4 flex flex-wrap items-end gap-3 rounded-xl bg-white ring-1 ring-slate-200 p-3">
+  <div class="flex-1 min-w-[200px]">
+    <div class="relative">
+      <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="search" name="q" value="{{ q }}" placeholder="Search by name, subdomain or email…" class="form-control" style="padding-left:2.4rem">
+    </div>
+  </div>
+  <select name="status" onchange="this.form.submit()" class="form-select" aria-label="Status">
+    <option value="">All statuses</option>
+    {% for val, label in statuses %}<option value="{{ val }}" {% if status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <div class="flex gap-2">
+    <button class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Search</button>
+    {% if filtered %}<a href="{% url 'tenant_list' %}" class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Clear</a>{% endif %}
+  </div>
+</form>
+<div class="rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Name</th><th class="px-4 py-3">Subdomain</th><th class="px-4 py-3">Plan</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Joined</th></tr></thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for s in schools %}
+      <tr class="hover:bg-slate-50">
+        <td class="px-4 py-3"><a href="{% url 'tenant_detail' s.pk %}" class="font-medium text-brand-700 hover:underline">{{ s.name }}</a></td>
+        <td class="px-4 py-3 text-slate-500">{{ s.slug }}</td>
+        <td class="px-4 py-3">{{ s.plan.name|default:"—" }}</td>
+        <td class="px-4 py-3"><span class="rounded-full px-2 py-0.5 text-xs {% if s.status == 'active' %}bg-green-50 text-green-700{% elif s.status == 'suspended' %}bg-red-50 text-red-700{% else %}bg-amber-50 text-amber-700{% endif %}">{{ s.get_status_display }}</span></td>
+        <td class="px-4 py-3 text-slate-400 text-xs">{{ s.created_at|date:"M d, Y" }}</td>
+      </tr>
+      {% empty %}<tr><td colspan="5" class="px-4 py-12 text-center text-slate-400">No schools registered.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% include "partials/_pagination.html" %}
+{% endblock %}

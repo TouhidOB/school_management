@@ -1,0 +1,20 @@
+{% extends "base_app.html" %}
+{% block page_title %}Parent Dashboard{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold text-slate-800 mb-6">My children</h2>
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  {% for c in children %}
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5">
+    <p class="font-semibold text-slate-800">{{ c.full_name }}</p>
+    <p class="text-sm text-slate-500">{{ c.current_class.name }} · {{ c.current_section.name }}</p>
+    <div class="mt-4 flex flex-wrap gap-2 text-xs">
+      <a href="{% url 'parent_attendance' %}" class="rounded-lg bg-slate-50 px-3 py-1.5 hover:bg-slate-100">Attendance</a>
+      <a href="{% url 'parent_results' %}" class="rounded-lg bg-slate-50 px-3 py-1.5 hover:bg-slate-100">Results</a>
+      <a href="{% url 'parent_invoices' %}" class="rounded-lg bg-slate-50 px-3 py-1.5 hover:bg-slate-100">Fees</a>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-slate-400">No children linked to your account.</p>
+  {% endfor %}
+</div>
+{% endblock %}

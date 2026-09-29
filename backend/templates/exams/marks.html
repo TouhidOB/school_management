@@ -1,0 +1,98 @@
+{% extends "base_app.html" %}
+{% load forms %}
+{% block page_title %}Marks Entry{% endblock %}
+{% block content %}
+<div class="mb-6">
+  <a href="{% url 'exam_detail' es.exam_session_id %}" class="text-sm text-slate-500 hover:text-brand-600">← {{ es.exam_session.name }}</a>
+  <h2 class="text-xl font-semibold text-slate-800 mt-1">{{ es.subject.name }}
+    <span class="text-sm font-normal text-slate-400">{{ es.subject.code }}</span>
+    — {{ es.school_class.name }}</h2>
+  <p class="text-sm text-slate-500">Total {{ es.total_marks }} · pass {{ es.pass_marks }} ·
+    <span class="{% if entered == total_students %}text-emerald-600{% else %}text-amber-600{% endif %}">{{ entered }}/{{ total_students }} entered</span></p>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-3">
+  <form method="post" class="lg:col-span-2 rounded-xl bg-white ring-1 ring-slate-200 overflow-hidden">
+    {% csrf_token %}
+    <div class="border-b border-slate-100 bg-slate-50/60 p-4">
+      <label class="block text-xs font-medium uppercase tracking-wide text-slate-500 mb-1">Quick entry by Student ID</label>
+      <div class="flex gap-2">
+        <input id="quick-id" placeholder="Roll or admission no. — e.g. 3 or 2026-003"
+               class="w-64 rounded-lg border-slate-300 text-sm" autocomplete="off">
+        <input id="quick-marks" placeholder="Marks" inputmode="decimal"
+               class="w-28 rounded-lg border-slate-300 text-sm">
+        <button type="button" id="quick-add"
+                class="rounded-lg bg-slate-800 px-4 text-sm font-medium text-white hover:bg-slate-700">Set ↵</button>
+      </div>
+      <p id="quick-msg" class="mt-1 text-xs text-slate-400">Type an ID, enter marks, press Enter — the row below fills in.</p>
+    </div>
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500">
+        <tr><th class="px-4 py-3">Roll</th><th class="px-4 py-3">Student ID</th>
+            <th class="px-4 py-3">Student</th><th class="px-4 py-3 w-36">Marks</th>
+            <th class="px-4 py-3 w-20">Absent</th></tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for s in students %}
+        {% with r=existing|dict_get:s.pk %}
+        <tr data-roll="{{ s.roll_number|lower }}" data-adm="{{ s.admission_number|lower }}">
+          <td class="px-4 py-2 text-slate-500">{{ s.roll_number|default:"—" }}</td>
+          <td class="px-4 py-2 font-mono text-xs text-slate-500">{{ s.admission_number }}</td>
+          <td class="px-4 py-2 font-medium">{{ s.full_name }}</td>
+          <td class="px-4 py-2"><input name="marks_{{ s.pk }}" value="{% if r and not r.is_absent %}{{ r.marks_obtained|floatformat:"-2" }}{% endif %}" class="marks-input w-28 rounded-lg border-slate-300 text-sm" placeholder="/ {{ es.total_marks }}"></td>
+          <td class="px-4 py-2 text-center"><input type="checkbox" name="absent_{{ s.pk }}" {% if r and r.is_absent %}checked{% endif %} class="rounded border-slate-300 text-brand-600"></td>
+        </tr>
+        {% endwith %}
+        {% empty %}<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">No students in this class.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% if students %}<div class="p-4"><button class="rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white hover:bg-brand-700">Save marks</button></div>{% endif %}
+  </form>
+
+  <div class="rounded-xl bg-white ring-1 ring-slate-200 p-5 h-fit">
+    <h3 class="font-semibold text-slate-800 mb-1">Standings — high to low</h3>
+    <p class="text-xs text-slate-400 mb-3">Sorted by saved marks.</p>
+    <ol class="space-y-1 text-sm">
+      {% for r in ranked %}
+      <li class="flex items-center justify-between rounded-lg px-3 py-1.5 {% if forloop.first %}bg-amber-50{% endif %}">
+        <span><span class="mr-2 inline-block w-5 text-right font-semibold text-slate-400">{{ forloop.counter }}.</span>{{ r.student.full_name }}</span>
+        <span class="font-semibold {% if r.marks_obtained < es.pass_marks %}text-rose-600{% else %}text-slate-700{% endif %}">{{ r.marks_obtained|floatformat:"-2" }}</span>
+      </li>
+      {% empty %}<li class="text-slate-400 text-sm">No marks saved yet.</li>{% endfor %}
+    </ol>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const idBox = document.getElementById("quick-id");
+    const marksBox = document.getElementById("quick-marks");
+    const msg = document.getElementById("quick-msg");
+    if (!idBox) return;
+    function findRow(q) {
+      q = q.trim().toLowerCase();
+      if (!q) return null;
+      return [...document.querySelectorAll("tr[data-adm]")].find(
+        (tr) => tr.dataset.adm === q || tr.dataset.roll === q);
+    }
+    function apply() {
+      const row = findRow(idBox.value);
+      if (!row) { msg.textContent = "No student with that ID."; msg.className = "mt-1 text-xs text-rose-600"; return; }
+      const input = row.querySelector(".marks-input");
+      input.value = marksBox.value;
+      row.classList.add("bg-emerald-50");
+      setTimeout(() => row.classList.remove("bg-emerald-50"), 900);
+      msg.textContent = row.children[2].textContent.trim() + " → " + (marksBox.value || "cleared");
+      msg.className = "mt-1 text-xs text-emerald-600";
+      idBox.value = ""; marksBox.value = ""; idBox.focus();
+    }
+    document.getElementById("quick-add").addEventListener("click", apply);
+    idBox.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); marksBox.focus(); }
+    });
+    marksBox.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); apply(); }
+    });
+  })();
+</script>
+{% endblock %}

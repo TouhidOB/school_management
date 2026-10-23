@@ -71,6 +71,13 @@ class UserSerializer(serializers.ModelSerializer):
 class SchoolTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Embed identity + tenant in the JWT and echo the user in the response."""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Allow client to pass either username or email in the request payload
+        if hasattr(self, "initial_data"):
+            if "email" in self.initial_data and "username" not in self.initial_data:
+                self.initial_data["username"] = self.initial_data["email"]
+
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
@@ -79,6 +86,16 @@ class SchoolTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
+        # Resolve username case-insensitively or by email
+        identifier = attrs.get(self.username_field, "").strip()
+        if identifier:
+            user_match = (
+                User.objects.filter(username__iexact=identifier).first()
+                or User.objects.filter(email__iexact=identifier).first()
+            )
+            if user_match:
+                attrs[self.username_field] = user_match.username
+
         data = super().validate(attrs)
         data["user"] = UserSerializer(self.user).data
         return data

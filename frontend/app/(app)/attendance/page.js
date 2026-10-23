@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import {
   Box,
@@ -22,10 +23,15 @@ import {
   FormControl,
   InputLabel,
   Select,
-  Alert
+  Alert,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import SearchIcon from "@mui/icons-material/Search";
+import PersonOffIcon from "@mui/icons-material/PersonOff";
+import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
+import AbsentStudentModal from "@/components/AbsentStudentModal";
 
 const STATUSES = ["present", "absent"];
 
@@ -42,6 +48,10 @@ export default function AttendancePage() {
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
+
+  // Absent Student Modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
 
   useEffect(() => {
     api.get("/classes/?page_size=200").then((d) => setClasses(d.results || d)).catch(() => {});
@@ -124,6 +134,23 @@ export default function AttendancePage() {
 
   return (
     <Box>
+      {/* Top Action Bar */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1.5 }}>
+        <Typography variant="h6" fontWeight="bold">
+          Daily Class Attendance
+        </Typography>
+        <Button
+          component={Link}
+          href="/attendance/absentees"
+          variant="outlined"
+          color="error"
+          startIcon={<PersonOffIcon />}
+          sx={{ fontWeight: 600 }}
+        >
+          Absent Students Desk
+        </Button>
+      </Box>
+
       <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', mb: 3 }}>
         <CardContent sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', alignItems: 'center' }}>
           <Typography variant="body1" fontWeight="bold">
@@ -211,36 +238,77 @@ export default function AttendancePage() {
                     <TableHead sx={{ bgcolor: 'action.hover' }}>
                       <TableRow>
                         <TableCell width="10%">Roll</TableCell>
-                        <TableCell width="40%">Student</TableCell>
-                        <TableCell width="50%" align="center">Status</TableCell>
+                        <TableCell width="32%">Student</TableCell>
+                        <TableCell width="34%" align="center">Status</TableCell>
+                        <TableCell width="24%" align="center">Follow-up / Parent Info</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {students.map((s) => (
-                        <TableRow key={s.id} hover>
-                          <TableCell>{s.roll_number || "—"}</TableCell>
-                          <TableCell sx={{ fontWeight: 500 }}>{s.full_name}</TableCell>
-                          <TableCell align="center">
-                            <ButtonGroup size="small">
-                              {STATUSES.map((st) => (
+                      {students.map((s) => {
+                        const isAbsent = marks[s.id]?.status === 'absent';
+                        return (
+                          <TableRow
+                            key={s.id}
+                            hover
+                            sx={{
+                              bgcolor: isAbsent ? 'rgba(211, 47, 47, 0.04)' : 'inherit',
+                              transition: 'background-color 0.2s',
+                            }}
+                          >
+                            <TableCell>{s.roll_number || "—"}</TableCell>
+                            <TableCell sx={{ fontWeight: 500 }}>{s.full_name}</TableCell>
+                            <TableCell align="center">
+                              <ButtonGroup size="small">
+                                {STATUSES.map((st) => (
+                                  <Button
+                                    key={st}
+                                    variant={marks[s.id]?.status === st ? "contained" : "outlined"}
+                                    color={
+                                      marks[s.id]?.status === st 
+                                        ? (st === 'present' ? 'success' : st === 'absent' ? 'error' : st === 'late' ? 'warning' : 'primary') 
+                                        : "inherit"
+                                    }
+                                    onClick={() => setStatus(s.id, st)}
+                                    sx={{ textTransform: 'capitalize', width: 80 }}
+                                  >
+                                    {st}
+                                  </Button>
+                                ))}
+                              </ButtonGroup>
+                            </TableCell>
+                            <TableCell align="center">
+                              {isAbsent ? (
                                 <Button
-                                  key={st}
-                                  variant={marks[s.id]?.status === st ? "contained" : "outlined"}
-                                  color={
-                                    marks[s.id]?.status === st 
-                                      ? (st === 'present' ? 'success' : st === 'absent' ? 'error' : st === 'late' ? 'warning' : 'primary') 
-                                      : "inherit"
-                                  }
-                                  onClick={() => setStatus(s.id, st)}
-                                  sx={{ textTransform: 'capitalize', width: 80 }}
+                                  size="small"
+                                  variant="outlined"
+                                  color="error"
+                                  startIcon={<ContactPhoneIcon fontSize="small" />}
+                                  onClick={() => {
+                                    setSelectedStudentId(s.id);
+                                    setModalOpen(true);
+                                  }}
+                                  sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.75rem', py: 0.2 }}
                                 >
-                                  {st}
+                                  Parent Info & Stats
                                 </Button>
-                              ))}
-                            </ButtonGroup>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                              ) : (
+                                <Tooltip title="View Student, Parent & Monthly Attendance Info">
+                                  <IconButton
+                                    size="small"
+                                    color="default"
+                                    onClick={() => {
+                                      setSelectedStudentId(s.id);
+                                      setModalOpen(true);
+                                    }}
+                                  >
+                                    <ContactPhoneIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -263,6 +331,18 @@ export default function AttendancePage() {
             )}
           </CardContent>
         </Card>
+      )}
+      {/* Absent Student & Parent Follow-up Modal */}
+      {selectedStudentId && (
+        <AbsentStudentModal
+          open={modalOpen}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedStudentId(null);
+          }}
+          studentId={selectedStudentId}
+          date={date}
+        />
       )}
     </Box>
   );

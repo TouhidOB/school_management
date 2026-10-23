@@ -6,6 +6,7 @@ import { Box, Typography, Tabs, Tab } from "@mui/material";
 
 const TABS = [
   { label: 'Daily Attendance', path: '/attendance' },
+  { label: 'Absentee Follow-up Desk', path: '/attendance/absentees' },
   { label: 'Reports', path: '/attendance/reports' }
 ];
 

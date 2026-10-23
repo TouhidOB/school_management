@@ -40,6 +40,7 @@ export default function StudentsPage() {
   const [filterYear, setFilterYear] = useState("");
   const [filterClass, setFilterClass] = useState("");
   const [filterSection, setFilterSection] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
   const [academicYears, setAcademicYears] = useState([]);
   const [classes, setClasses] = useState([]);
   const [sections, setSections] = useState([]);
@@ -86,6 +87,7 @@ export default function StudentsPage() {
     if (filterYear) params.set("academic_year", filterYear);
     if (filterClass) params.set("current_class", filterClass);
     if (filterSection) params.set("current_section", filterSection);
+    if (filterStatus) params.set("status", filterStatus);
     if (orderBy) {
       params.set("ordering", orderDir === "desc" ? `-${orderBy}` : orderBy);
     }
@@ -94,7 +96,7 @@ export default function StudentsPage() {
       .then(setData)
       .catch(() => setData({ results: [], count: 0 }))
       .finally(() => setLoading(false));
-  }, [page, search, filterYear, filterClass, filterSection, orderBy, orderDir, yearsLoaded]);
+  }, [page, search, filterYear, filterClass, filterSection, filterStatus, orderBy, orderDir, yearsLoaded]);
 
   useEffect(() => {
     const t = setTimeout(load, search ? 300 : 0); // debounce search
@@ -217,6 +219,23 @@ export default function StudentsPage() {
                 .map(s => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
               }
             </TextField>
+            <TextField
+              select
+              size="small"
+              label="Status"
+              value={filterStatus}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setPage(1);
+              }}
+              sx={{ minWidth: 150 }}
+            >
+              <MenuItem value="">All Statuses</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="alumni">Alumni / Ex-Student</MenuItem>
+              <MenuItem value="transferred">Transferred</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </TextField>
           </Box>
 
           <TableContainer sx={{ mt: 2 }}>
@@ -302,8 +321,9 @@ export default function StudentsPage() {
                         <Chip 
                           label={s.status} 
                           size="small" 
-                          variant="outlined" 
-                          sx={{ textTransform: 'capitalize' }} 
+                          color={s.status === 'alumni' ? 'secondary' : s.status === 'active' ? 'success' : 'default'}
+                          variant={s.status === 'alumni' ? 'filled' : 'outlined'} 
+                          sx={{ textTransform: 'capitalize', fontWeight: s.status === 'alumni' ? 600 : 400 }} 
                         />
                       </TableCell>
                       <TableCell align="right">

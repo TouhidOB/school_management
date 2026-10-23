@@ -9,5 +9,7 @@ router.register("guardians", v.GuardianViewSet)
 router.register("student-transfers", v.StudentTransferViewSet)
 router.register("certificates", v.CertificateViewSet)
 router.register("admissions", v.AdmissionApplicationViewSet)
+router.register("passing-batches", v.PassingBatchViewSet)
+router.register("alumni-profiles", v.AlumniProfileViewSet)
 
 urlpatterns = router.urls

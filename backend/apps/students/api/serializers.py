@@ -47,9 +47,11 @@ from apps.rooms.models import (
 )
 from apps.students.models import (
     AdmissionApplication,
+    AlumniProfile,
     ApplicationGuardian,
     Certificate,
     Guardian,
+    PassingBatch,
     Student,
     StudentTransfer,
 )
@@ -155,3 +157,48 @@ class PublicAdmissionApplicationSerializer(serializers.ModelSerializer):
             "father_occupation",
             "mother_phone",
         ]
+
+
+class PassingBatchSerializer(serializers.ModelSerializer):
+    graduating_class_name = serializers.CharField(source="graduating_class.name", read_only=True, default=None)
+    academic_year_name = serializers.CharField(source="academic_year.name", read_only=True, default=None)
+    total_students = serializers.IntegerField(read_only=True, default=0)
+
+    class Meta:
+        model = PassingBatch
+        fields = [
+            "id", "name", "passing_year", "graduating_class", "graduating_class_name",
+            "academic_year", "academic_year_name", "graduation_date", "description",
+            "banner_image", "total_students", "created_at"
+        ]
+
+
+class AlumniProfileSerializer(serializers.ModelSerializer):
+    batch_name = serializers.CharField(source="batch.name", read_only=True)
+    batch_year = serializers.IntegerField(source="batch.passing_year", read_only=True)
+    student_name = serializers.CharField(source="student.full_name", read_only=True)
+    admission_number = serializers.CharField(source="student.admission_number", read_only=True)
+    gender = serializers.CharField(source="student.gender", read_only=True)
+    blood_group = serializers.CharField(source="student.blood_group", read_only=True)
+    emergency_contact = serializers.CharField(source="student.emergency_contact", read_only=True)
+    student_photo = serializers.SerializerMethodField()
+    current_status_display = serializers.CharField(source="get_current_status_display", read_only=True)
+
+    class Meta:
+        model = AlumniProfile
+        fields = [
+            "id", "batch", "batch_name", "batch_year", "student", "student_name",
+            "student_photo", "admission_number", "gender", "blood_group", "emergency_contact",
+            "passing_roll", "passing_result", "current_status", "current_status_display",
+            "current_institution", "current_occupation", "contact_phone", "contact_email",
+            "current_city", "achievements", "notes", "created_at"
+        ]
+
+    def get_student_photo(self, obj):
+        if obj.student and obj.student.photo:
+            try:
+                return obj.student.photo.url
+            except Exception:
+                return None
+        return None
+

@@ -202,3 +202,58 @@ class ApplicationGuardian(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.get_relation_display()})"
+
+
+class PassingBatch(SchoolScopedModel):
+    name = models.CharField(max_length=120, help_text="e.g. Batch 2024 - SSC, Class 10 Passing Out 2023")
+    passing_year = models.PositiveIntegerField(db_index=True, help_text="Passing year, e.g. 2024")
+    graduating_class = models.ForeignKey(
+        "academics.SchoolClass", on_delete=models.SET_NULL, null=True, blank=True, related_name="graduated_batches"
+    )
+    academic_year = models.ForeignKey(
+        "academics.AcademicYear", on_delete=models.SET_NULL, null=True, blank=True, related_name="graduated_batches"
+    )
+    graduation_date = models.DateField(null=True, blank=True)
+    description = models.TextField(blank=True, help_text="Batch overview, motto, or special memory")
+    banner_image = models.ImageField(upload_to="batch_banners/", null=True, blank=True)
+
+    class Meta:
+        ordering = ["-passing_year", "-created_at"]
+        unique_together = [("school", "name")]
+
+    def __str__(self):
+        return f"{self.name} ({self.passing_year})"
+
+
+class AlumniProfile(SchoolScopedModel):
+    STATUS_CHOICES = [
+        ("higher_study", "Higher Study / College / University"),
+        ("employed", "Employed / Job"),
+        ("business", "Business / Entrepreneurship"),
+        ("preparing", "Preparing for Admission / Exams"),
+        ("other", "Other / Undisclosed"),
+    ]
+
+    batch = models.ForeignKey(
+        PassingBatch, on_delete=models.CASCADE, related_name="alumni_members"
+    )
+    student = models.OneToOneField(
+        Student, on_delete=models.CASCADE, related_name="alumni_profile"
+    )
+    passing_roll = models.CharField(max_length=20, blank=True, help_text="Final roll in graduating class")
+    passing_result = models.CharField(max_length=50, blank=True, help_text="Final GPA, Grade, or Division (e.g. GPA 5.00)")
+    current_status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="higher_study")
+    current_institution = models.CharField(max_length=200, blank=True, help_text="Current College/University/Institute")
+    current_occupation = models.CharField(max_length=200, blank=True, help_text="Current Job Title, Designation, or Major")
+    contact_phone = models.CharField(max_length=30, blank=True, help_text="Updated contact number")
+    contact_email = models.EmailField(blank=True, help_text="Updated email address")
+    current_city = models.CharField(max_length=100, blank=True)
+    achievements = models.TextField(blank=True, help_text="Awards, scholarships, accolades")
+    notes = models.TextField(blank=True, help_text="Testimonial, remarks, or memories")
+
+    class Meta:
+        ordering = ["passing_roll", "student__full_name"]
+        unique_together = [("school", "student")]
+
+    def __str__(self):
+        return f"{self.student.full_name} - {self.batch.name}"

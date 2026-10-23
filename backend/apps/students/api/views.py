@@ -36,7 +36,13 @@ from apps.rooms.models import (
     Assignment, AssignmentSubmission, ClassRoom, Note, RoomMembership, RoomPost,
 )
 from apps.students.models import (
-    AdmissionApplication, Certificate, Guardian, Student, StudentTransfer,
+    AdmissionApplication,
+    AlumniProfile,
+    Certificate,
+    Guardian,
+    PassingBatch,
+    Student,
+    StudentTransfer,
 )
 from apps.teachers.models import Designation, TeacherProfile
 from apps.tenants.models import ContactMessage, School, SubscriptionPlan
@@ -311,3 +317,146 @@ class AdmissionApplicationViewSet(SchoolScopedViewSet):
         app.reviewed_at = timezone.now()
         app.save()
         return Response(self.get_serializer(app).data)
+
+
+class PassingBatchViewSet(SchoolScopedViewSet):
+    queryset = PassingBatch.objects.all()
+    serializer_class = s.PassingBatchSerializer
+    filterset_fields = ["passing_year", "graduating_class", "academic_year"]
+    search_fields = ["name", "description"]
+    ordering_fields = ["passing_year", "name", "created_at"]
+    ordering = ["-passing_year", "-created_at"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.select_related("graduating_class", "academic_year").annotate(
+            total_students=Count("alumni_members", distinct=True)
+        )
+
+    @action(detail=True, methods=["get"])
+    def students(self, request, pk=None):
+        """Returns all alumni in this batch with student demographic details."""
+        batch = self.get_object()
+        qs = AlumniProfile.objects.filter(
+            batch=batch
+        ).select_related("student", "batch")
+        
+        search = request.query_params.get("search")
+        if search:
+            from django.db.models import Q
+            qs = qs.filter(
+                Q(student__full_name__icontains=search) |
+                Q(student__admission_number__icontains=search) |
+                Q(passing_roll__icontains=search) |
+                Q(current_institution__icontains=search) |
+                Q(current_occupation__icontains=search) |
+                Q(contact_phone__icontains=search)
+            )
+
+        status_filter = request.query_params.get("current_status")
+        if status_filter:
+            qs = qs.filter(current_status=status_filter)
+
+        ordering = request.query_params.get("ordering", "passing_roll")
+        if ordering:
+            qs = qs.order_by(ordering)
+
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            serializer = s.AlumniProfileSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = s.AlumniProfileSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["post"])
+    def graduate_class(self, request, pk=None):
+        """Bulk graduate students into this batch and mark them as alumni."""
+        batch = self.get_object()
+        data = request.data
+        student_ids = data.get("student_ids", [])
+        academic_year_id = data.get("academic_year_id")
+        class_id = data.get("class_id")
+        results_map = data.get("results", {})
+        default_result = data.get("default_result", "Passed")
+        graduation_date = data.get("graduation_date") or batch.graduation_date
+
+        if not student_ids and academic_year_id and class_id:
+            student_ids = list(
+                Student.objects.filter(
+                    school=self._active_school,
+                    current_class_id=class_id,
+                    academic_year_id=academic_year_id,
+                    status="active"
+                ).values_list("id", flat=True)
+            )
+
+        if not student_ids:
+            return Response({"error": "No students selected to graduate."}, status=400)
+
+        students = Student.objects.filter(
+            id__in=student_ids,
+            school=self._active_school
+        ).prefetch_related("guardians")
+
+        graduated_count = 0
+        for student in students:
+            student.status = "alumni"
+            student.save(update_fields=["status"])
+
+            primary_guardian = student.guardians.filter(is_primary_contact=True).first()
+            phone = student.emergency_contact or (primary_guardian.phone if primary_guardian else "")
+            city = student.present_zilla or student.present_thana or ""
+
+            result_val = results_map.get(str(student.id)) or results_map.get(student.id) or default_result
+
+            profile, created = AlumniProfile.objects.update_or_create(
+                school=self._active_school,
+                student=student,
+                defaults={
+                    "batch": batch,
+                    "passing_roll": student.roll_number or "",
+                    "passing_result": result_val or "Passed",
+                    "contact_phone": phone,
+                    "current_city": city,
+                }
+            )
+            graduated_count += 1
+
+        if graduation_date and not batch.graduation_date:
+            batch.graduation_date = graduation_date
+            batch.save(update_fields=["graduation_date"])
+
+        return Response({
+            "message": f"Successfully graduated {graduated_count} students into {batch.name}!",
+            "graduated_count": graduated_count,
+            "batch_id": batch.id,
+            "batch_name": batch.name,
+        })
+
+
+class AlumniProfileViewSet(SchoolScopedViewSet):
+    queryset = AlumniProfile.objects.all()
+    serializer_class = s.AlumniProfileSerializer
+    filterset_fields = ["batch", "current_status", "batch__passing_year"]
+    search_fields = [
+        "student__full_name",
+        "student__admission_number",
+        "passing_roll",
+        "current_institution",
+        "current_occupation",
+        "contact_phone",
+    ]
+    ordering_fields = ["passing_roll", "student__full_name", "created_at", "passing_result"]
+    ordering = ["passing_roll", "student__full_name"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.select_related("batch", "student")
+
+    def perform_create(self, serializer):
+        profile = serializer.save(school=self._active_school)
+        if profile.student and profile.student.status != "alumni":
+            profile.student.status = "alumni"
+            profile.student.save(update_fields=["status"])
+

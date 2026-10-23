@@ -48,6 +48,7 @@ const SIDEBAR_ITEMS = [
   { href: "/dashboard", key: "dashboard", label: "Dashboard", icon: <SpeedIcon /> },
   { href: "/school-settings", key: "schoolSettings", label: "School", icon: <BusinessIcon /> },
   { href: "/students", key: "students", label: "Students", icon: <PeopleIcon /> },
+  { href: "/ex-students", key: "exStudents", label: "Ex-Students", icon: <SchoolIcon /> },
   { href: "/teachers", key: "teachers", label: "Teachers", icon: <PersonIcon /> },
   { href: "/academics", key: "academics", label: "Academics", icon: <MenuBookIcon /> },
   { href: "/timetable", key: "timetable", label: "Timetable", icon: <CalendarMonthIcon /> },

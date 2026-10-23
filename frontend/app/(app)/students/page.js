@@ -29,6 +29,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import BadgeIcon from "@mui/icons-material/Badge";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SchoolIcon from "@mui/icons-material/School";
 
 export default function StudentsPage() {
   const [data, setData] = useState({ results: [], count: 0 });
@@ -112,7 +113,16 @@ export default function StudentsPage() {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" fontWeight="bold">Students</Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+          <Button
+            component={Link}
+            href="/ex-students"
+            variant="outlined"
+            color="primary"
+            startIcon={<SchoolIcon />}
+          >
+            Ex-Students (Batches)
+          </Button>
           {filterClass && (
             <Button
               variant="outlined"

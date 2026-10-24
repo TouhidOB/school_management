@@ -124,7 +124,7 @@ class AdmissionApplicationSerializer(serializers.ModelSerializer):
         fields = [
             "id", "status", "status_display", "tracking_code", "full_name",
             "dob", "gender", "class_applied", "phone", "email", "address", "permanent_address", "present_thana", "present_zilla", "present_postal_code", "permanent_thana", "permanent_zilla", "permanent_postal_code",
-            "previous_school", "guardian_phone",
+            "previous_school",
             "guardians", "rejection_reason", "created_at",
         ]
         read_only_fields = ["status", "tracking_code"]

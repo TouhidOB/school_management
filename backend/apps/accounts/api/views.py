@@ -41,6 +41,8 @@ from apps.tenants.models import ContactMessage, School, SubscriptionPlan
 
 from apps.core.api import SchoolScopedViewSet, get_active_school
 from apps.core.permissions import IsSuperAdmin
+from apps.tenants.api.serializers import DeviceSettingsSerializer
+from apps.attendance.api.serializers import BiometricPunchSerializer
 from . import serializers as s
 
 User = get_user_model()
@@ -83,11 +85,11 @@ class DeviceSettingsView(APIView):
     token-regenerate action (POST)."""
 
     def _payload(self, request, school):
-        data = s.DeviceSettingsSerializer(school).data
+        data = DeviceSettingsSerializer(school).data
         data["ingest_url"] = request.build_absolute_uri("/api/devices/punch/")
         data["unresolved_punches"] = BiometricPunch.objects.filter(status="unresolved").count()
         recent = BiometricPunch.objects.order_by("-punched_at")[:20]
-        data["recent_punches"] = s.BiometricPunchSerializer(recent, many=True).data
+        data["recent_punches"] = BiometricPunchSerializer(recent, many=True).data
         return data
 
     def _school(self, request):
@@ -110,7 +112,7 @@ class DeviceSettingsView(APIView):
         school = self._school(request)
         if school is None:
             return Response({"detail": "No active school."}, status=404)
-        ser = s.DeviceSettingsSerializer(school, data=request.data, partial=True)
+        ser = DeviceSettingsSerializer(school, data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
         ser.save()
         return Response(self._payload(request, school))

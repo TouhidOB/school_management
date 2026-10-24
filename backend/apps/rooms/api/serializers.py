@@ -121,7 +121,6 @@ class RoomPostSerializer(serializers.ModelSerializer):
 
 class RoomMembershipSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source="student.full_name", read_only=True)
-    files = AssignmentSubmissionFileSerializer(many=True, read_only=True)
 
     class Meta:
         model = RoomMembership

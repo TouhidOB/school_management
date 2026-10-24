@@ -149,14 +149,23 @@ class AdmissionApplicationSerializer(serializers.ModelSerializer):
 
 class PublicAdmissionApplicationSerializer(serializers.ModelSerializer):
     guardians = ApplicationGuardianSerializer(many=True, required=False)
+
     class Meta:
         model = AdmissionApplication
         fields = [
             "full_name", "dob", "gender", "class_applied", "phone", "email",
-            "address", "previous_school", "guardian_phone",
-            "father_occupation",
-            "mother_phone",
+            "address", "permanent_address", "present_thana", "present_zilla", "present_postal_code",
+            "permanent_thana", "permanent_zilla", "permanent_postal_code",
+            "previous_school", "birth_certificate", "transfer_certificate",
+            "guardians",
         ]
+
+    def create(self, validated_data):
+        guardians_data = validated_data.pop('guardians', [])
+        application = super().create(validated_data)
+        for g_data in guardians_data:
+            ApplicationGuardian.objects.create(application=application, **g_data)
+        return application
 
 
 class PassingBatchSerializer(serializers.ModelSerializer):

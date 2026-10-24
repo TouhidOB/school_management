@@ -6,12 +6,14 @@ from apps.library.models import BookCategory, Book, BookIssue
 from . import serializers as s
 
 class BookCategoryViewSet(SchoolScopedViewSet):
+    required_module = "library"
     queryset = BookCategory.objects.all()
     serializer_class = s.BookCategorySerializer
     search_fields = ["name"]
 
 
 class BookViewSet(SchoolScopedViewSet):
+    required_module = "library"
     queryset = Book.objects.select_related("category").all()
     serializer_class = s.BookSerializer
     filterset_fields = ["category"]
@@ -19,6 +21,7 @@ class BookViewSet(SchoolScopedViewSet):
 
 
 class BookIssueViewSet(SchoolScopedViewSet):
+    required_module = "library"
     queryset = BookIssue.objects.select_related("book", "student").all()
     serializer_class = s.BookIssueSerializer
     filterset_fields = ["status", "student", "book"]

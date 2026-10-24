@@ -46,6 +46,7 @@ from . import serializers as s
 User = get_user_model()
 
 class ClassRoomViewSet(SchoolScopedViewSet):
+    required_module = "learning"
     queryset = ClassRoom.objects.select_related("subject", "section").all()
     serializer_class = s.ClassRoomSerializer
     filterset_fields = ["subject", "section", "is_active"]
@@ -60,6 +61,7 @@ class ClassRoomViewSet(SchoolScopedViewSet):
 
 
 class NoteViewSet(SchoolScopedViewSet):
+    required_module = "learning"
     queryset = Note.objects.all()
     serializer_class = s.NoteSerializer
     filterset_fields = ["room", "is_important"]
@@ -69,12 +71,14 @@ class NoteViewSet(SchoolScopedViewSet):
 
 
 class AssignmentViewSet(SchoolScopedViewSet):
+    required_module = "homework"
     queryset = Assignment.objects.all()
     serializer_class = s.AssignmentSerializer
     filterset_fields = ["room", "is_published"]
 
 
 class AssignmentSubmissionViewSet(SchoolScopedViewSet):
+    required_module = "homework"
     queryset = AssignmentSubmission.objects.select_related("student").all()
     serializer_class = s.AssignmentSubmissionSerializer
     filterset_fields = ["assignment", "student"]
@@ -91,6 +95,7 @@ class AssignmentSubmissionViewSet(SchoolScopedViewSet):
 
 
 class RoomPostViewSet(SchoolScopedViewSet):
+    required_module = "learning"
     queryset = RoomPost.objects.all()
     serializer_class = s.RoomPostSerializer
     filterset_fields = ["room", "post_type"]
@@ -100,6 +105,7 @@ class RoomPostViewSet(SchoolScopedViewSet):
 
 
 class RoomMembershipViewSet(SchoolScopedViewSet):
+    required_module = "learning"
     queryset = RoomMembership.objects.select_related("student").all()
     serializer_class = s.RoomMembershipSerializer
     filterset_fields = ["room", "student", "is_active"]

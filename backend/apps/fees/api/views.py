@@ -47,12 +47,14 @@ from . import serializers as s
 User = get_user_model()
 
 class FeeTypeViewSet(SchoolScopedViewSet):
+    required_module = "finance"
     queryset = FeeType.objects.all()
     serializer_class = s.FeeTypeSerializer
     search_fields = ["name"]
 
 
 class FeeStructureViewSet(SchoolScopedViewSet):
+    required_module = "finance"
     queryset = FeeStructure.objects.select_related("fee_type", "applicable_class", "applicable_student").all()
     serializer_class = s.FeeStructureSerializer
     filterset_fields = ["fee_type", "academic_year", "applicable_class", "applicable_student"]
@@ -158,6 +160,7 @@ class FeeStructureViewSet(SchoolScopedViewSet):
 
 
 class StudentFeeDiscountViewSet(SchoolScopedViewSet):
+    required_module = "finance"
     queryset = StudentFeeDiscount.objects.select_related(
         "student", "student__current_class", "student__current_section", "fee_type"
     ).all().order_by("-id")
@@ -168,6 +171,7 @@ class StudentFeeDiscountViewSet(SchoolScopedViewSet):
 
 
 class InvoiceViewSet(SchoolScopedViewSet):
+    required_module = "finance"
     queryset = Invoice.objects.select_related("student").prefetch_related("payments").all()
     serializer_class = s.InvoiceSerializer
     filterset_fields = ["status", "student", "academic_year"]
@@ -197,6 +201,7 @@ class InvoiceViewSet(SchoolScopedViewSet):
 
 
 class PaymentViewSet(SchoolScopedViewSet):
+    required_module = "finance"
     queryset = Payment.objects.select_related("invoice").all()
     serializer_class = s.PaymentSerializer
     filterset_fields = ["invoice", "payment_method"]
@@ -205,11 +210,13 @@ class PaymentViewSet(SchoolScopedViewSet):
         serializer.save(school=self._active_school, received_by=self.request.user)
 
 class ExpenseCategoryViewSet(SchoolScopedViewSet):
+    required_module = "expenses"
     queryset = ExpenseCategory.objects.all()
     serializer_class = s.ExpenseCategorySerializer
     search_fields = ["name"]
 
 class ExpenseViewSet(SchoolScopedViewSet):
+    required_module = "expenses"
     queryset = Expense.objects.select_related("category", "recorded_by").all()
     serializer_class = s.ExpenseSerializer
     filterset_fields = ["category"]
@@ -219,6 +226,7 @@ class ExpenseViewSet(SchoolScopedViewSet):
 
 
 class SalaryPaymentViewSet(SchoolScopedViewSet):
+    required_module = "hr"
     queryset = SalaryPayment.objects.select_related("teacher", "disbursed_by").all()
     serializer_class = s.SalaryPaymentSerializer
     filterset_fields = ["employee_type", "payment_basis", "period_year", "period_month", "status"]
@@ -340,6 +348,7 @@ class SalaryPaymentViewSet(SchoolScopedViewSet):
 
 class StudentDuesViewSet(SchoolScopedViewSet):
     """Provides student-level pending dues, roll, id, name, and 1-click payment with receipt redirect."""
+    required_module = "finance"
 
     def list(self, request):
         school = getattr(self, "_active_school", None)
@@ -621,6 +630,7 @@ class StudentDuesViewSet(SchoolScopedViewSet):
 
 class SchoolWalletViewSet(SchoolScopedViewSet):
     """Real-time treasury wallet aggregating collections (+), salaries (-), and expenses (-)."""
+    required_module = "finance"
     queryset = SchoolWallet.objects.all()
     serializer_class = s.SchoolWalletSerializer
 

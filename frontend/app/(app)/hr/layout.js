@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
+import ModuleGuard from "@/components/ModuleGuard";
 
 const TABS = [
   { label: 'Overview', path: '/hr' },
@@ -27,32 +28,34 @@ export default function Layout({ children }) {
   };
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight="bold">
-          HR & Payroll
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Manage staff, attendance, leaves, and payroll.
-        </Typography>
-      </Box>
+    <ModuleGuard moduleKey="hr">
+      <Box>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h5" fontWeight="bold">
+            HR & Payroll
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Manage staff, attendance, leaves, and payroll.
+          </Typography>
+        </Box>
 
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          textColor="primary"
-          indicatorColor="primary"
-        >
-          {TABS.map((tab, idx) => (
-            <Tab key={idx} label={tab.label} sx={{ textTransform: 'none', fontWeight: 500 }} />
-          ))}
-        </Tabs>
-      </Box>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            textColor="primary"
+            indicatorColor="primary"
+          >
+            {TABS.map((tab, idx) => (
+              <Tab key={idx} label={tab.label} sx={{ textTransform: 'none', fontWeight: 500 }} />
+            ))}
+          </Tabs>
+        </Box>
 
-      {children}
-    </Box>
+        {children}
+      </Box>
+    </ModuleGuard>
   );
 }

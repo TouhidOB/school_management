@@ -46,18 +46,21 @@ from . import serializers as s
 User = get_user_model()
 
 class RatingPeriodViewSet(SchoolScopedViewSet):
+    required_module = "ratings"
     queryset = RatingPeriod.objects.all()
     serializer_class = s.RatingPeriodSerializer
     filterset_fields = ["is_active"]
 
 
 class TeacherRatingViewSet(SchoolScopedViewSet):
+    required_module = "ratings"
     queryset = TeacherRating.objects.all()
     serializer_class = s.TeacherRatingSerializer
     filterset_fields = ["teacher", "rating_period", "student"]
 
 
 class TeacherRatingAggregateViewSet(SchoolScopedViewSet):
+    required_module = "ratings"
     queryset = TeacherRatingAggregate.objects.select_related("teacher").all()
     serializer_class = s.TeacherRatingAggregateSerializer
     filterset_fields = ["teacher", "rating_period"]

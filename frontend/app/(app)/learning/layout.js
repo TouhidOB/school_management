@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
+import ModuleGuard from "@/components/ModuleGuard";
 
 const TABS = [
   { label: 'Study Materials', path: '/learning' },
@@ -23,32 +24,34 @@ export default function Layout({ children }) {
   };
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight="bold">
-          Learning Management (LMS)
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Manage course materials, study resources, and online classes.
-        </Typography>
-      </Box>
+    <ModuleGuard moduleKey="learning">
+      <Box>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h5" fontWeight="bold">
+            Learning Management (LMS)
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Manage course materials, study resources, and online classes.
+          </Typography>
+        </Box>
 
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          textColor="primary"
-          indicatorColor="primary"
-        >
-          {TABS.map((tab, idx) => (
-            <Tab key={idx} label={tab.label} sx={{ textTransform: 'none', fontWeight: 500 }} />
-          ))}
-        </Tabs>
-      </Box>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            textColor="primary"
+            indicatorColor="primary"
+          >
+            {TABS.map((tab, idx) => (
+              <Tab key={idx} label={tab.label} sx={{ textTransform: 'none', fontWeight: 500 }} />
+            ))}
+          </Tabs>
+        </Box>
 
-      {children}
-    </Box>
+        {children}
+      </Box>
+    </ModuleGuard>
   );
 }

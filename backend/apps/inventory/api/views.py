@@ -6,18 +6,21 @@ from apps.inventory.models import ItemCategory, Supplier, Item, ItemIssue
 from . import serializers as s
 
 class ItemCategoryViewSet(SchoolScopedViewSet):
+    required_module = "inventory"
     queryset = ItemCategory.objects.all()
     serializer_class = s.ItemCategorySerializer
     search_fields = ["name"]
 
 
 class SupplierViewSet(SchoolScopedViewSet):
+    required_module = "inventory"
     queryset = Supplier.objects.all()
     serializer_class = s.SupplierSerializer
     search_fields = ["name", "contact_person"]
 
 
 class ItemViewSet(SchoolScopedViewSet):
+    required_module = "inventory"
     queryset = Item.objects.select_related("category").all()
     serializer_class = s.ItemSerializer
     filterset_fields = ["category"]
@@ -25,6 +28,7 @@ class ItemViewSet(SchoolScopedViewSet):
 
 
 class ItemIssueViewSet(SchoolScopedViewSet):
+    required_module = "inventory"
     queryset = ItemIssue.objects.select_related("item").all()
     serializer_class = s.ItemIssueSerializer
     filterset_fields = ["item", "status"]

@@ -46,6 +46,7 @@ from . import serializers as s
 User = get_user_model()
 
 class NotificationViewSet(SchoolScopedViewSet):
+    required_module = "communication"
     queryset = Notification.objects.all()
     serializer_class = s.NotificationSerializer
     filterset_fields = ["recipient", "channel", "status"]

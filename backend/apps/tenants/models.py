@@ -220,33 +220,10 @@ class School(TimeStampedModel):
         help_text="Module availability toggles, e.g. {'hr': True, 'hostel': False}"
     )
 
-    DEFAULT_MODULES = {
-        "hr": True,
-        "library": True,
-        "transport": True,
-        "hostel": True,
-        "inventory": True,
-        "communication": True,
-        "events": True,
-        "certificates": True,
-        "reports": True,
-        "finance": True,
-        "exams": True,
-        "homework": True,
-        "learning": True,
-        "attendance": True,
-        "timetable": True,
-        "academics": True,
-        "teachers": True,
-        "students": True,
-    }
-
     def get_modules(self):
-        """Returns complete dict of all modules with defaults applied."""
-        result = dict(self.DEFAULT_MODULES)
-        if isinstance(self.modules, dict):
-            result.update(self.modules)
-        return result
+        """Returns complete dict of all modules with 3-tier cascade and defaults applied."""
+        from apps.core.modules import resolve_school_modules
+        return resolve_school_modules(self)
 
     # School is the tenant itself (not tenant-scoped). `all_objects` mirrors
     # `objects` so platform-level code can use one consistent accessor.

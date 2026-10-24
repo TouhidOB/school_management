@@ -74,6 +74,7 @@ class SectionViewSet(SchoolScopedViewSet):
 
 
 class RoutineSlotViewSet(SchoolScopedViewSet):
+    required_module = "timetable"
     queryset = RoutineSlot.objects.select_related("subject", "teacher", "section").all()
     serializer_class = s.RoutineSlotSerializer
     filterset_fields = ["section", "day_of_week", "teacher"]
@@ -128,12 +129,14 @@ class RoutineSlotViewSet(SchoolScopedViewSet):
 from apps.academics.models import Event
 
 class EventViewSet(SchoolScopedViewSet):
+    required_module = "events"
     queryset = Event.objects.all()
     serializer_class = s.EventSerializer
     filterset_fields = ["event_type"]
     search_fields = ["title", "description"]
 
 class StudyMaterialViewSet(SchoolScopedViewSet):
+    required_module = "learning"
     queryset = StudyMaterial.objects.select_related("school_class", "subject").all()
     serializer_class = s.StudyMaterialSerializer
     filterset_fields = ["school_class", "subject"]
@@ -144,6 +147,7 @@ class StudyMaterialViewSet(SchoolScopedViewSet):
         serializer.save(school=self._active_school, uploaded_by=teacher)
 
 class OnlineClassViewSet(SchoolScopedViewSet):
+    required_module = "learning"
     queryset = OnlineClass.objects.select_related("school_class", "subject").all()
     serializer_class = s.OnlineClassSerializer
     filterset_fields = ["school_class", "subject"]

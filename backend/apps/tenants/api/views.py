@@ -96,16 +96,39 @@ class AdminSchoolViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post", "patch"])
     def set_modules(self, request, pk=None):
         school = self.get_object()
+        from apps.core.modules import validate_module_dependencies, MANDATORY_MODULES
+
+        if request.data.get("reset_to_plan"):
+            school.modules = {}
+            school.save(update_fields=["modules"])
+            return Response({
+                "status": "success",
+                "message": "Reset modules to plan defaults.",
+                "modules": school.get_modules(),
+                "school": s.SchoolSerializer(school).data,
+                "warnings": []
+            })
+
         new_modules = request.data.get("modules", {})
         if isinstance(new_modules, dict):
+            # Guard mandatory modules: cannot be disabled
+            for mandatory_key in MANDATORY_MODULES:
+                if mandatory_key in new_modules:
+                    new_modules[mandatory_key] = True
+
             current = dict(school.modules or {})
             current.update(new_modules)
             school.modules = current
             school.save(update_fields=["modules"])
+
+        effective = school.get_modules()
+        warnings = validate_module_dependencies(effective)
+
         return Response({
             "status": "success",
-            "modules": school.get_modules(),
-            "school": s.SchoolSerializer(school).data
+            "modules": effective,
+            "school": s.SchoolSerializer(school).data,
+            "warnings": warnings,
         })
 
     @action(detail=True, methods=["get"])
@@ -333,3 +356,26 @@ class GlobalSearchView(APIView):
             "schools": [{"id": s.id, "title": s.name, "subtitle": s.slug, "type": "School"} for s in schools],
             "users": [{"id": u.id, "title": f"{u.first_name} {u.last_name}".strip() or u.username, "subtitle": u.email, "type": "User"} for u in users]
         })
+
+
+class PlatformModulesView(APIView):
+    """
+    Returns the complete system module registry, category groupings,
+    and dependency maps for SuperAdmin dashboard and frontend navigation.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from apps.core.modules import (
+            MODULE_REGISTRY,
+            MODULE_CATEGORIES,
+            DEFAULT_MODULES,
+            MANDATORY_MODULES,
+        )
+        return Response({
+            "modules": MODULE_REGISTRY,
+            "categories": MODULE_CATEGORIES,
+            "default_modules": DEFAULT_MODULES,
+            "mandatory_modules": list(MANDATORY_MODULES),
+        })
+

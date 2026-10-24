@@ -212,6 +212,7 @@ def serialize_absent_student(student, school, attendance_record=None, target_dat
 
 
 class StudentAttendanceViewSet(SchoolScopedViewSet):
+    required_module = "attendance"
     queryset = StudentAttendance.objects.select_related("student").all()
     serializer_class = s.StudentAttendanceSerializer
     filterset_fields = ["section", "date", "status", "student"]
@@ -323,30 +324,35 @@ class StudentAttendanceViewSet(SchoolScopedViewSet):
 
 
 class StaffAttendanceViewSet(SchoolScopedViewSet):
+    required_module = "hr"
     queryset = StaffAttendance.objects.select_related("teacher").all()
     serializer_class = s.StaffAttendanceSerializer
     filterset_fields = ["teacher", "date", "is_present"]
 
 
 class LeaveApplicationViewSet(SchoolScopedViewSet):
+    required_module = "attendance"
     queryset = LeaveApplication.objects.select_related("student").all()
     serializer_class = s.LeaveApplicationSerializer
     filterset_fields = ["student", "status"]
 
 
 class BiometricEnrollmentViewSet(SchoolScopedViewSet):
+    required_module = "biometric"
     queryset = BiometricEnrollment.objects.all()
     serializer_class = s.BiometricEnrollmentSerializer
     search_fields = ["device_user_id", "label"]
 
 
 class BiometricPunchViewSet(SchoolScopedViewSet):
+    required_module = "biometric"
     queryset = BiometricPunch.objects.all()
     serializer_class = s.BiometricPunchSerializer
     filterset_fields = ["status", "direction"]
     http_method_names = ["get", "head", "options"]  # read-only (ingested by device API)
 
 class StaffLeaveApplicationViewSet(SchoolScopedViewSet):
+    required_module = "hr"
     queryset = StaffLeaveApplication.objects.select_related("teacher", "reviewed_by").all()
     serializer_class = s.StaffLeaveApplicationSerializer
     filterset_fields = ["teacher", "status"]

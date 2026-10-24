@@ -241,12 +241,14 @@ class StudentTransferViewSet(SchoolScopedViewSet):
 
 
 class CertificateViewSet(SchoolScopedViewSet):
+    required_module = "certificates"
     queryset = Certificate.objects.select_related("student").all()
     serializer_class = s.CertificateSerializer
     filterset_fields = ["student", "cert_type"]
 
 
 class AdmissionApplicationViewSet(SchoolScopedViewSet):
+    required_module = "admissions"
     queryset = AdmissionApplication.objects.all()
     serializer_class = s.AdmissionApplicationSerializer
     filterset_fields = ["status"]
@@ -320,6 +322,7 @@ class AdmissionApplicationViewSet(SchoolScopedViewSet):
 
 
 class PassingBatchViewSet(SchoolScopedViewSet):
+    required_module = "exStudents"
     queryset = PassingBatch.objects.all()
     serializer_class = s.PassingBatchSerializer
     filterset_fields = ["passing_year", "graduating_class", "academic_year"]
@@ -436,6 +439,7 @@ class PassingBatchViewSet(SchoolScopedViewSet):
 
 
 class AlumniProfileViewSet(SchoolScopedViewSet):
+    required_module = "exStudents"
     queryset = AlumniProfile.objects.all()
     serializer_class = s.AlumniProfileSerializer
     filterset_fields = ["batch", "current_status", "batch__passing_year"]

@@ -30,11 +30,16 @@ import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
 import CancelIcon from '@mui/icons-material/Cancel';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import SchoolIcon from '@mui/icons-material/School';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
+import StarIcon from '@mui/icons-material/Star';
+import BusinessIcon from '@mui/icons-material/Business';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 import KPICard from "@/components/ui/KPICard";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
-import { MODULES, MODULE_MAP } from "@/lib/modules";
+import { MODULES, MODULE_MAP, MODULE_CATEGORIES, MANDATORY_MODULE_KEYS } from "@/lib/modules";
 
 
 function a11yProps(index) {
@@ -93,6 +98,12 @@ const getModuleIcon = (key) => {
     case "academics": return <MenuBookIcon />;
     case "teachers": return <PersonIcon />;
     case "students": return <PeopleIcon />;
+    case "exStudents": return <SchoolIcon />;
+    case "admissions": return <CheckCircleIcon />;
+    case "schoolSettings": return <BusinessIcon />;
+    case "ratings": return <StarIcon />;
+    case "biometric": return <FingerprintIcon />;
+    case "expenses": return <PaidIcon />;
     default: return <TuneIcon />;
   }
 };
@@ -118,7 +129,7 @@ export default function SchoolDetail() {
   }, [schoolModules]);
 
   const addonActiveCount = useMemo(() => {
-    return MODULES.filter(m => m.category === "addon" && (schoolModules || {})[m.key] !== false).length;
+    return MODULES.filter(m => !m.isMandatory && (schoolModules || {})[m.key] !== false).length;
   }, [schoolModules]);
 
   const filteredModules = useMemo(() => {
@@ -138,30 +149,22 @@ export default function SchoolDetail() {
   }, [categoryFilter, moduleSearch]);
 
   const groupedModules = useMemo(() => {
-    const groups = {
-      addon: {
-        title: "Specialized Add-on Modules (Circled Extensions)",
-        subtitle: "Optional modules for specialized school requirements. Toggling OFF hides them from the sidebar.",
-        color: "#6366f1",
-        items: []
-      },
-      academic: {
-        title: "Academic & Operational Modules",
-        subtitle: "Coursework, examination, homework, schedules, and financial collections.",
-        color: "#0284c7",
-        items: []
-      },
-      core: {
-        title: "Core Foundation Directory Modules",
-        subtitle: "Essential directories for students, faculty, and academic classes.",
-        color: "#059669",
-        items: []
-      }
-    };
+    const groups = {};
+    MODULE_CATEGORIES.forEach((cat) => {
+      groups[cat.key] = {
+        title: cat.label,
+        subtitle: cat.subtitle,
+        color: cat.color,
+        items: [],
+      };
+    });
 
-    filteredModules.forEach(m => {
+    filteredModules.forEach((m) => {
       if (groups[m.category]) {
         groups[m.category].items.push(m);
+      } else {
+        if (!groups.core) groups.core = { title: "Core Modules", subtitle: "Core features", color: "#059669", items: [] };
+        groups.core.items.push(m);
       }
     });
 
@@ -229,11 +232,11 @@ export default function SchoolDetail() {
       MODULES.forEach(m => { payload[m.key] = true; });
     } else if (mode === "disable_addons") {
       MODULES.forEach(m => {
-        if (m.category === "addon") payload[m.key] = false;
+        if (!m.isMandatory) payload[m.key] = false;
       });
     } else if (mode === "enable_addons") {
       MODULES.forEach(m => {
-        if (m.category === "addon") payload[m.key] = true;
+        if (!m.isMandatory) payload[m.key] = true;
       });
     }
 
@@ -249,6 +252,23 @@ export default function SchoolDetail() {
       console.error(err);
       fetchSchoolData();
       alert("Failed to update modules.");
+    } finally {
+      setUpdatingModule(null);
+    }
+  };
+
+  const handleResetToPlan = async () => {
+    if (!confirm(`Reset all modules for ${school.name} to match its subscription plan defaults? This clears custom overrides.`)) return;
+    setUpdatingModule("reset");
+    try {
+      const res = await api.post(`/platform/schools/${id}/set_modules/`, { reset_to_plan: true });
+      if (res && res.modules) {
+        setSchoolModules(res.modules);
+      }
+      setModuleToast("Modules reset to subscription plan defaults successfully.");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to reset modules.");
     } finally {
       setUpdatingModule(null);
     }
@@ -422,7 +442,7 @@ export default function SchoolDetail() {
                   disabled={updatingModule !== null}
                   sx={{ textTransform: 'none', fontWeight: 600 }}
                 >
-                  Enable All Modules
+                  Enable All
                 </Button>
                 <Button 
                   size="small" 
@@ -433,7 +453,7 @@ export default function SchoolDetail() {
                   disabled={updatingModule !== null}
                   sx={{ textTransform: 'none', fontWeight: 600 }}
                 >
-                  Deactivate Add-ons (9)
+                  Deactivate Add-ons
                 </Button>
                 <Button 
                   size="small" 
@@ -444,7 +464,18 @@ export default function SchoolDetail() {
                   disabled={updatingModule !== null}
                   sx={{ textTransform: 'none', fontWeight: 600 }}
                 >
-                  Activate Add-ons (9)
+                  Activate Add-ons
+                </Button>
+                <Button 
+                  size="small" 
+                  variant="outlined" 
+                  color="secondary"
+                  startIcon={<RestartAltIcon />}
+                  onClick={handleResetToPlan}
+                  disabled={updatingModule !== null}
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                >
+                  Reset to Plan Defaults
                 </Button>
               </Stack>
             </Box>
@@ -468,13 +499,13 @@ export default function SchoolDetail() {
               <Grid item xs={12} sm={4}>
                 <Paper elevation={0} sx={{ p: 2, bgcolor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 2 }}>
                   <Typography variant="caption" color="text.secondary" fontWeight="bold" display="block">
-                    SPECIALIZED ADD-ONS (CIRCLED)
+                    ADD-ON MODULES ACTIVE
                   </Typography>
                   <Typography variant="h5" fontWeight="bold" sx={{ color: "#4f46e5" }}>
-                    {addonActiveCount} / 9 Active
+                    {addonActiveCount} / {MODULES.filter(m => !m.isMandatory).length} Active
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    HR, Library, Transport, Hostel, Inventory, etc.
+                    Optional features enabled
                   </Typography>
                 </Paper>
               </Grid>
@@ -511,31 +542,25 @@ export default function SchoolDetail() {
                 sx={{ width: { xs: '100%', sm: 300 } }}
               />
 
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1 }}>
                 <Chip 
                   label={`All (${MODULES.length})`}
                   clickable
                   color={categoryFilter === "all" ? "primary" : "default"}
                   onClick={() => setCategoryFilter("all")}
                 />
-                <Chip 
-                  label={`Add-ons (9)`}
-                  clickable
-                  color={categoryFilter === "addon" ? "primary" : "default"}
-                  onClick={() => setCategoryFilter("addon")}
-                />
-                <Chip 
-                  label={`Academic & Ops (6)`}
-                  clickable
-                  color={categoryFilter === "academic" ? "primary" : "default"}
-                  onClick={() => setCategoryFilter("academic")}
-                />
-                <Chip 
-                  label={`Core (3)`}
-                  clickable
-                  color={categoryFilter === "core" ? "primary" : "default"}
-                  onClick={() => setCategoryFilter("core")}
-                />
+                {MODULE_CATEGORIES.map(cat => {
+                  const count = MODULES.filter(m => m.category === cat.key).length;
+                  return (
+                    <Chip 
+                      key={cat.key}
+                      label={`${cat.label} (${count})`}
+                      clickable
+                      color={categoryFilter === cat.key ? "primary" : "default"}
+                      onClick={() => setCategoryFilter(cat.key)}
+                    />
+                  );
+                })}
               </Stack>
             </Box>
 
@@ -624,18 +649,28 @@ export default function SchoolDetail() {
 
                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     {isUpdating && <CircularProgress size={18} />}
-                                    <Switch 
-                                      checked={isEnabled}
-                                      onChange={() => handleToggleModule(m.key, isEnabled)}
-                                      disabled={isUpdating}
-                                      color="primary"
-                                    />
+                                    <Tooltip title={m.isMandatory ? "Core Foundation module is required and cannot be deactivated." : ""}>
+                                      <span>
+                                        <Switch 
+                                          checked={isEnabled}
+                                          onChange={() => handleToggleModule(m.key, isEnabled)}
+                                          disabled={isUpdating || m.isMandatory}
+                                          color="primary"
+                                        />
+                                      </span>
+                                    </Tooltip>
                                   </Box>
                                 </Box>
 
-                                <Typography variant="body2" color="text.secondary" sx={{ minHeight: 38, mb: 1.5, fontSize: '0.85rem' }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ minHeight: 38, mb: 1, fontSize: '0.85rem' }}>
                                   {m.description}
                                 </Typography>
+
+                                {m.dependencies && m.dependencies.length > 0 && (
+                                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontStyle: 'italic' }}>
+                                    Requires: {m.dependencies.map(d => MODULE_MAP[d]?.label || d).join(', ')}
+                                  </Typography>
+                                )}
 
                                 <Divider sx={{ my: 1.5 }} />
 

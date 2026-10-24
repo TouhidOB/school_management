@@ -3,10 +3,8 @@
 
 FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package.json ./
-# No lockfile committed yet, so `npm install` (not `npm ci`). Add a lockfile
-# later and switch to `npm ci` for reproducible builds.
-RUN npm install
+COPY package.json package-lock.json* ./
+RUN npm install --legacy-peer-deps
 
 FROM node:20-alpine AS builder
 WORKDIR /app

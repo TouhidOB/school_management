@@ -39,7 +39,8 @@ def get_active_school(request):
     if getattr(user, "is_super_admin", False):
         sid = request.META.get(ACTIVE_SCHOOL_META)
         if not sid:
-            sid = request.session.get("active_school_id")
+            session = getattr(request, "session", None)
+            sid = session.get("active_school_id") if session else None
         if not sid:
             return None
         from apps.tenants.models import School
@@ -52,8 +53,9 @@ class SchoolScopedViewSet(viewsets.ModelViewSet):
     """ModelViewSet pinned to the caller's effective school.
 
     Subclasses just set `queryset` + `serializer_class`; this base handles
-    tenant binding, filtering, and stamping `school` on create.
+    tenant binding, filtering, module availability enforcement, and stamping `school` on create.
     """
+    required_module = None
 
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
@@ -62,6 +64,18 @@ class SchoolScopedViewSet(viewsets.ModelViewSet):
             # Bind thread-local so nested manager queries (serializer choice
             # fields, related PK lookups) are tenant-filtered too.
             set_current_school(self._active_school)
+
+            # Enforce module availability for the active school
+            if self.required_module:
+                modules = self._active_school.get_modules()
+                if not modules.get(self.required_module, True):
+                    bypass = getattr(request.user, "is_super_admin", False) and request.META.get("HTTP_X_BYPASS_MODULE_CHECK") == "1"
+                    if not bypass:
+                        raise PermissionDenied({
+                            "detail": f"The '{self.required_module}' module is currently disabled for this institution.",
+                            "module": self.required_module,
+                            "code": "module_disabled"
+                        })
 
     def finalize_response(self, request, response, *args, **kwargs):
         clear_current_school()

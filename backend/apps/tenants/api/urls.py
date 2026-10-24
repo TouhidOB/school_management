@@ -10,6 +10,7 @@ router.register("plans", v.AdminPlanViewSet)
 urlpatterns = [
     path("platform/stats/", v.PlatformStatsView.as_view(), name="api_platform_stats"),
     path("platform/search/", v.GlobalSearchView.as_view(), name="api_platform_search"),
+    path("platform/modules/", v.PlatformModulesView.as_view(), name="api_platform_modules"),
     path("platform/", include(router.urls)),
     path("public/schools/", v.PublicSchoolListView.as_view()),
     path("public/schools/<slug:slug>/", v.PublicSchoolDetailView.as_view()),

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
+import ModuleGuard from "@/components/ModuleGuard";
 
 const TABS = [
   { label: 'Student', path: '/reports' },
@@ -26,32 +27,37 @@ export default function Layout({ children }) {
   };
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight="bold">
-          Interactive Reports
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          View comprehensive academic, financial, and operational reports.
-        </Typography>
-      </Box>
+    <ModuleGuard moduleKey="reports">
+      <Box>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h5" fontWeight="bold">
+            Interactive Reports
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            View comprehensive academic, financial, and operational reports.
+          </Typography>
+        </Box>
 
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          textColor="primary"
-          indicatorColor="primary"
-        >
-          {TABS.map((tab, idx) => (
-            <Tab key={idx} label={tab.label} sx={{ textTransform: 'none', fontWeight: 500 }} />
-          ))}
-        </Tabs>
-      </Box>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            textColor="primary"
+            indicatorColor="primary"
+            sx={{
+              "& .MuiTab-root": { textTransform: "none", fontWeight: 600 }
+            }}
+          >
+            {TABS.map((tab, idx) => (
+              <Tab key={idx} label={tab.label} />
+            ))}
+          </Tabs>
+        </Box>
 
-      {children}
-    </Box>
+        {children}
+      </Box>
+    </ModuleGuard>
   );
 }

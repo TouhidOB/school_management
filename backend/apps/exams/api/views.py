@@ -71,6 +71,7 @@ def _compute_merit(session):
 
 
 class ExamSessionViewSet(SchoolScopedViewSet):
+    required_module = "exams"
     queryset = ExamSession.objects.select_related("academic_year").all()
     serializer_class = s.ExamSessionSerializer
     filterset_fields = ["academic_year", "is_published"]
@@ -153,12 +154,14 @@ class ExamSessionViewSet(SchoolScopedViewSet):
 
 
 class ExamSubjectViewSet(SchoolScopedViewSet):
+    required_module = "exams"
     queryset = ExamSubject.objects.select_related("subject", "school_class").all()
     serializer_class = s.ExamSubjectSerializer
     filterset_fields = ["exam_session", "school_class", "subject"]
 
 
 class ExamResultViewSet(SchoolScopedViewSet):
+    required_module = "exams"
     queryset = ExamResult.objects.select_related("student").all()
     serializer_class = s.ExamResultSerializer
     filterset_fields = ["exam_subject", "student"]
@@ -168,6 +171,7 @@ class ExamResultViewSet(SchoolScopedViewSet):
 
 
 class StudentPromotionViewSet(SchoolScopedViewSet):
+    required_module = "exams"
     queryset = StudentPromotion.objects.select_related("student").all()
     serializer_class = s.StudentPromotionSerializer
     filterset_fields = ["exam_session", "student"]
